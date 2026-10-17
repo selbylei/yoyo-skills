@@ -1,0 +1,17 @@
+{
+  "name": "yoyo-skills",
+  "version": "0.1.0",
+  "description": "yoyo 的 agent skill 合集：项目两层记忆同步、Gitee/Codeup 一句话建仓推送",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "skills",
+    "agent-skills"
+  ],
+  "license": "MIT",
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  }
+}
