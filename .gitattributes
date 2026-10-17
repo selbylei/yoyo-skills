@@ -1,0 +1,2 @@
+# 锁 markdown 行尾（记忆/文档类文件跨机 pull/push 免 CRLF diff 噪音）
+*.md text eol=lf
