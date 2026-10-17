@@ -1,4 +1,7 @@
 # AI 中间件 / 工具项目级产物（不进仓库）
+# agent 指令与项目记忆（AI 生成物，本机留存即可）
+AGENTS.md
+docs/
 # 各 agent 的项目级 skills 目录（npx skills / pi install -l 等在本项目生成）
 .pi/
 .claude/
