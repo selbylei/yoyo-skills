@@ -1,7 +1,7 @@
 {
   "name": "yoyo-skills",
-  "version": "0.1.0",
-  "description": "yoyo 的 agent skill 合集：项目两层记忆同步、Gitee/Codeup 一句话建仓推送",
+  "version": "0.2.0",
+  "description": "yoyo 的 agent skill 合集：项目两层记忆同步、Gitee/Codeup 一句话建仓推送、抖音视频逐字稿",
   "keywords": [
     "pi-package",
     "pi",
