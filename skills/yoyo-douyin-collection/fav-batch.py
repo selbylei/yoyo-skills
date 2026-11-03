@@ -46,10 +46,10 @@ log("bsk session=" + sid)
 bsk(["navigate", "https://www.douyin.com/user/self"], sid)
 time.sleep(6)
 
-# ---- 阶段1: 页内 API 取直链 + 元数据（10/批，批内 4 并发，每批重试 3 轮）----
+# ---- 阶段1a: 元数据 5/批（不含 cdn，防 bsk ~3.3KB 输出截断）----
 urlmap = {}
-for c in range(0, len(IDS), 10):
-    chunk = IDS[c:c+10]
+for c in range(0, len(IDS), 5):
+    chunk = IDS[c:c+5]
     js = """(async () => {
       const ids = %s;
       const out = await Promise.all(ids.map(async id => {
@@ -57,8 +57,7 @@ for c in range(0, len(IDS), 10):
           const r = await fetch('/aweme/v1/web/aweme/detail/?aweme_id='+id+'&aid=1128&device_platform=webapp', {credentials:'include'});
           const j = await r.json(); const d = j.aweme_detail;
           if (!d) return [id, null];
-          const cdn = (d.video && d.video.play_addr && d.video.play_addr.url_list && d.video.play_addr.url_list[0]) || '';
-          return [id, {cdn, title:String(d.desc||'').slice(0,80), dur:(d.video&&d.video.duration)||0, nick:(d.author&&d.author.nickname)||''}];
+          return [id, {title:String(d.desc||'').replace(/\\s+/g,' ').slice(0,80), dur:(d.video&&d.video.duration)||0, nick:(d.author&&d.author.nickname)||''}];
         } catch(e) { return [id, null]; }
       }));
       return JSON.stringify(out);
@@ -75,7 +74,38 @@ for c in range(0, len(IDS), 10):
         if got and all(str(a) in urlmap for a in chunk):
             break
         time.sleep(5)
-    log("取链 %d/%d" % (min(c+10, len(IDS)), len(IDS)))
+    for a in chunk:
+        urlmap[a] = urlmap.get(a) or {}
+    log("元数据 %d/%d" % (min(c+5, len(IDS)), len(IDS)))
+
+# ---- 阶段1b: 直链逐条取（单条输出 ~600 字符，安全）----
+for a in IDS:
+    m = urlmap.get(a) or {}
+    if m.get("cdn"):
+        continue
+    for _ in range(3):
+        js = """(async () => {
+          try {
+            const r = await fetch('/aweme/v1/web/aweme/detail/?aweme_id=' + %s + '&aid=1128&device_platform=webapp', {credentials:'include'});
+            const j = await r.json(); const d = j.aweme_detail;
+            return d && d.video && d.video.play_addr && d.video.play_addr.url_list ? d.video.play_addr.url_list[0] : '';
+          } catch(e) { return ''; }
+        })()""" % json.dumps(a)
+        rc, out = bsk(["evaluate", js], sid)
+        for line in out.splitlines():
+            if line.startswith("http"):
+                cdn = line.strip()
+                base = cdn.split("?")[0]
+                q = line[line.index("?"):] if "?" in line else ""
+                # 只存必要部分: 完整 URL 保留（curl 需要签名参数）
+                m["cdn"] = cdn
+                urlmap[a] = m
+                break
+        else:
+            time.sleep(4)
+        if m.get("cdn"):
+            break
+    log("直链 %d/%d %s" % (IDS.index(a)+1, len(IDS), "OK" if urlmap.get(a, {}).get("cdn") else "FAIL"))
 json.dump(urlmap, open(os.path.join(OUT, "meta.json"), "w"), ensure_ascii=True)
 targets = [(a, urlmap[a]) for a in IDS if urlmap.get(a) and urlmap[a].get("cdn")]
 for a, b in targets:
