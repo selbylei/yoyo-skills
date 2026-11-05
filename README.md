@@ -7,8 +7,8 @@ yoyo 的 agent skill 合集（pi coding agent / 通用 agent skill 格式），�
 **pi coding agent（原生包机制，推荐）**：
 
 ```bash
-pi install git:github.com/selbylei/yoyo-skills@v0.3.0    # 个人级（写 ~/.pi/agent/settings.json）
-pi install git:github.com/selbylei/yoyo-skills@v0.3.0 -l # 项目级（写 .pi/settings.json，需项目信任）
+pi install git:github.com/selbylei/yoyo-skills@v0.4.0    # 个人级（写 ~/.pi/agent/settings.json）
+pi install git:github.com/selbylei/yoyo-skills@v0.4.0 -l # 项目级（写 .pi/settings.json，需项目信任）
 ```
 
 `pi list` 查看，`pi remove git:github.com/selbylei/yoyo-skills` 卸载。
@@ -70,6 +70,7 @@ npx skills add selbylei/yoyo-skills -a trae -g
 | `yoyo-gitee-repo` | Gitee 一句话建仓推送（bash + Open API v5） | bash/curl/git + 出网 gitee.com + 各机自备 `~/.gitee-token` |
 | `yoyo-codeup-repo` | 阿里云 Codeup(云效) 一句话建仓推送（SSH 路线） | git/ssh + 出网 codeup.aliyun.com:22 + 公钥登记在阿里云账号 |
 | `yoyo-douyin-digest` | 抖音视频 → 逐字稿笔记（本机 Chrome cookies 下载 + faster-whisper 本地转写，自带脚本） | bash/uv + 出网 douyin.com + 本机 Chrome 抖音登录态（cookies 各机自备，不进仓） |
+| `yoyo-github-cards` | GitHub 热门开源六卡图文（抖音 1242×1656）出图/换内容重出 | hypit CLI + Chrome（`hypit capture --channel chrome`）+ 图片尺寸校验工具（ffprobe 或等价）；Noto Sans SC 优先 |
 
 本仓库**不含任何凭据**；各 skill 依赖的 token/SSH key 由使用方在各机自备，缺失时按各 SKILL.md「环境要求」节先补齐。
 
