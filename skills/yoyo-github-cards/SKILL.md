@@ -2,15 +2,29 @@
 
 版式 2026-11-03 定稿（参考帖 7703407329438531791 像素采样），之后各期只换内容不动版式。
 
-## 配置区（换机器先改这里；默认值 = 原始配置机）
+## 配置（三值：工作目录 / 内容源 / 出图目录）
 
-| 配置 | 默认值 | 说明 |
-|---|---|---|
-| 工作目录 | `F:\learn\hypit` | hypit 项目：管线工具 `hypit capture`、`assets/cards/cards.html`、`avatars/` 都在此 |
-| 内容源 | `F:\obsidian\个人文档\数据采集\GitHub-Trending\<YYYY-MM-DD>.md` | 每期日报，每项目含 一句话简介/Stars/语言/许可/亮点/注意 |
-| 出图目录 | `<工作目录>/assets/cards/01-06.png` | 1242×1656，抖音图文 3:4 |
+**取值优先级**（取到即停）：
+1. 用户会话中给的机器值（说「本机 hypit 在 …」时用它的）
+2. 本地配置文件 `<工作目录>/assets/cards/local.md`（机器级，不进仓；只存三行路径，首次部署时写）
+3. 都没有 → 先跑「新机器部署」补齐再开工
+
+| 配置 | 说明 |
+|---|---|
+| 工作目录 | hypit 项目根：管线工具 `hypit capture`、`assets/cards/cards.html`、`avatars/` 都在此 |
+| 内容源 | 每期日报目录 `<...>/GitHub-Trending/<YYYY-MM-DD>.md`，每项目含 一句话简介/Stars/语言/许可/亮点/注意 |
+| 出图目录 | 固定 `<工作目录>/assets/cards/01-06.png`（1242×1656，抖音图文 3:4） |
 
 **依赖**：hypit CLI、Chrome（`hypit capture` 带 `--channel chrome`）、图片尺寸校验工具（ffprobe 或等价）、Noto Sans SC 字体（本机没有时换同类 CJK 无衬线，勿换回 YaHei）。
+
+### 新机器部署（配置缺失时）
+
+1. clone 用户的 hypit 项目到任意目录（路径记下来，就是「工作目录」；clone 地址问用户或查其仓库台账）
+2. 定位/新建内容源：优先找该机已有的 `GitHub-Trending/` 日报目录（如 obsidian 个人文档）；没有就问用户每期日报存哪，要能跨机分发才建进 obsidian 库
+3. 字体：查 Noto Sans SC（`fc-list | grep -i "noto sans sc"` 或系统字体目录），没有就装或按依赖节降级
+4. 把三值写入 `<工作目录>/assets/cards/local.md`（格式：三行 `key: value`），汇报取值来源后继续出图流程
+
+（原始配置机 `win` 的取值：工作目录 `F:\learn\hypit`，内容源 `F:\obsidian\个人文档\数据采集\GitHub-Trending\`；该机的 local.md 可直接抄这两行。）
 
 ## 事实源与产物
 
