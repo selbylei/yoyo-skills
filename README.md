@@ -7,8 +7,8 @@ yoyo 的 agent skill 合集（pi coding agent / 通用 agent skill 格式），�
 **pi coding agent（原生包机制，推荐）**：
 
 ```bash
-pi install git:github.com/selbylei/yoyo-skills@v0.2.0    # 个人级（写 ~/.pi/agent/settings.json）
-pi install git:github.com/selbylei/yoyo-skills@v0.2.0 -l # 项目级（写 .pi/settings.json，需项目信任）
+pi install git:github.com/selbylei/yoyo-skills@v0.3.0    # 个人级（写 ~/.pi/agent/settings.json）
+pi install git:github.com/selbylei/yoyo-skills@v0.3.0 -l # 项目级（写 .pi/settings.json，需项目信任）
 ```
 
 `pi list` 查看，`pi remove git:github.com/selbylei/yoyo-skills` 卸载。
