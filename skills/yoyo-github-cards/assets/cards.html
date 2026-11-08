@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>GitHub 六卡模板（版式参考版 7703407329438531791 · 内容每期替换）</title>
+<!--
+  版式 2026-11-03 定稿，取自参考帖 7703407329438531791 像素采样（见 references/）。
+  6 个 section：#c1 封面（TOP5 排行）+ #c2..#c6 单项目满版页（11-05 起每期 1 项目/卡）。
+  每期只换内容，不动版式。设计令牌勿凭记忆改：bg #fafbf8 / 蓝 #174bb9 / 线 #dadad8 /
+  面板 #f1f4ff / top3 行底 #fceeec #fcf6e6 #edf2fe。字体 Noto Sans SC（缺则同类 CJK 无衬线）。
+-->
+<style>
+:root{
+  --bg:#fafbf8; --ink:#000; --gray:#7a7a7a; --gray2:#7e7e7e; --note:#6d6d6d;
+  --line:#dadad8; --panel:#f1f4ff; --blue:#174bb9; --red:#e13d59;
+  --tint1:#fceeec; --tint2:#fcf6e6; --tint3:#edf2fe;
+  --mono:Consolas,"SF Mono",Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink)}
+section{width:1242px;height:1656px;position:relative;overflow:hidden;background:var(--bg);
+  padding:0 92px 0;display:flex;flex-direction:column}
+
+/* ---------- 公共：顶栏 ---------- */
+.topbar{display:flex;justify-content:space-between;align-items:center;
+  padding-top:64px;padding-bottom:23px;border-bottom:1px solid var(--line)}
+.topbar .brand{font-size:26px;font-weight:600}
+.topbar .brand b{color:var(--blue);font-weight:800}
+.topbar .pg{font-family:var(--mono);font-size:24px;font-weight:700}
+
+/* ---------- c1 封面 ---------- */
+#c1{padding-bottom:69px}
+.hero{margin-top:49px;line-height:1.28;font-weight:900}
+.hero .l1,.hero .l2{font-size:104px}
+.hero .topN{color:var(--blue);position:relative;margin-left:26px;padding-bottom:14px}
+.hero .topN::after{content:"";position:absolute;left:0;right:0;bottom:0;height:12px;background:var(--red)}
+.lang{margin-top:26px;font-size:24px;color:var(--note)}
+.meta{margin-top:18px;font-family:var(--mono);font-size:28px;font-weight:800}
+.rank{margin-top:16px;flex:1;display:flex;flex-direction:column;
+  border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff}
+.rank-head{display:flex;justify-content:space-between;align-items:center;
+  height:64px;padding:0 28px;font-size:24px;color:var(--gray);font-weight:600;background:#fff}
+.rank-head .star{color:var(--gray)}
+.row{flex:1;display:flex;align-items:center;gap:28px;padding:0 28px;
+  border-top:1px solid var(--line)}
+.row.r1{background:var(--tint1)} .row.r2{background:var(--tint2)} .row.r3{background:var(--tint3)}
+.row .num{font-family:var(--mono);font-size:46px;font-weight:800;color:var(--blue);width:70px}
+.row .ava{width:52px;height:52px;border-radius:12px;object-fit:cover;flex:0 0 52px}
+.row .nm{flex:1;min-width:0}
+.row .name{font-size:34px;font-weight:900;line-height:1.25}
+.row .od{font-size:22px;color:var(--gray);margin-top:4px}
+.row .stars{font-family:var(--mono);font-size:34px;font-weight:800}
+
+/* ---------- c2-c6 单项目满版页 ---------- */
+.card-page{padding-bottom:129px}
+.hd{display:flex;align-items:center;gap:28px;margin-top:49px;min-height:108px}
+.hd .num{font-family:var(--mono);font-size:46px;font-weight:800;color:var(--blue);width:70px}
+.hd .ava{width:80px;height:80px;border-radius:18px;object-fit:cover;flex:0 0 80px}
+.hd .nm{flex:1;min-width:0}
+.hd h2{font-size:104px;font-weight:900;line-height:1.05}
+.hd h2.long{font-size:56px}
+.hd .org{font-family:var(--mono);font-size:20px;color:var(--gray);margin-top:8px}
+.gain{margin-left:auto;text-align:right;flex:0 0 auto}
+.gain .lb{font-size:22px;color:var(--gray)}
+.gain .v{font-family:var(--mono);font-size:46px;font-weight:800;color:var(--blue);margin-top:4px}
+.oneline{margin-top:37px;font-size:40px;font-weight:900;line-height:1.3}
+.badges{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+.bdg{font-size:22px;font-weight:600;padding:10px 20px;border-radius:12px;background:#f2f2ef;color:#111}
+.bdg:first-child{background:var(--blue);color:#fff}
+.cols{display:flex;gap:40px;margin-top:42px;align-items:stretch}
+.panel{flex:0 0 504px;width:504px;background:var(--panel);border-radius:20px;padding:36px}
+.step{margin-bottom:24px}
+.step:last-child{margin-bottom:0}
+.step .t{font-size:28px;font-weight:800}
+.step .d{font-size:22px;color:var(--note);margin-top:6px;line-height:1.5}
+.cols .right{flex:1;min-width:0;display:flex;flex-direction:column}
+.cols .desc{font-size:24px;color:var(--gray2);line-height:1.7}
+.cols .cat{font-size:28px;font-weight:800;color:var(--blue);margin-top:auto;padding-top:22px}
+.points{margin-top:38px}
+.points p{font-size:26px;line-height:1.6;font-weight:500;margin-bottom:10px}
+.points .k{color:var(--blue);font-weight:800;margin-right:12px}
+.warn{margin-top:28px;font-size:22px;color:var(--gray)}
+.warn .k{margin-right:10px}
+.foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center}
+.foot .repo{font-family:var(--mono);font-size:20px;color:var(--gray)}
+.foot .pg{font-family:var(--mono);font-size:24px;font-weight:800;color:var(--blue)}
+</style>
+</head>
+<body>
+
+<!-- ============ c1 封面（TOP5 排行） ============ -->
+<section id="c1">
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">01 / 06</span></div>
+  <div class="hero">
+    <div class="l1">本期热门开源</div>
+    <div class="l2">热门项目<span class="topN">TOP5</span></div>
+  </div>
+  <div class="lang">收录 5 个主流语言热榜仓库 · 净增 = 本周 − 上周 Stars</div>
+  <div class="meta">2026.11.02–11.08</div>
+  <div class="rank">
+    <div class="rank-head"><span>GitHub 周榜 · 收录仓库净增</span><span class="star">本周净增 ⭐</span></div>
+    <div class="row r1"><span class="num">01</span><img class="ava" src="avatars/morluto.png" alt="morluto">
+      <span class="nm"><span class="name">REA</span><br><span class="od">辅助分析软件与程序的运行逻辑</span></span><span class="stars">+31,036</span></div>
+    <div class="row r2"><span class="num">02</span><img class="ava" src="avatars/gathin23.png" alt="Gathin23">
+      <span class="nm"><span class="name">CleanYourTV</span><br><span class="od">简化 Android TV 桌面与预装服务</span></span><span class="stars">+13,165</span></div>
+    <div class="row r3"><span class="num">03</span><img class="ava" src="avatars/dshorg.png" alt="dsh">
+      <span class="nm"><span class="name">dsh-our-free-model</span><br><span class="od">为 dsh 添加模型接入功能</span></span><span class="stars">+11,375</span></div>
+    <div class="row"><span class="num">04</span><img class="ava" src="avatars/impeccable.png" alt="impeccable">
+      <span class="nm"><span class="name">Impeccable</span><br><span class="od">用设计指令调整网页，检查界面细节</span></span><span class="stars">+10,681</span></div>
+    <div class="row"><span class="num">05</span><img class="ava" src="avatars/togetherai.png" alt="togetherai">
+      <span class="nm"><span class="name">Hallmark</span><br><span class="od">按视觉主题制作网页，检查设计质量</span></span><span class="stars">+10,377</span></div>
+  </div>
+</section>
+
+<!-- ============ c2..c6 单项目满版页（结构相同，内容每期替换） ============ -->
+<section id="c2" class="card-page">
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">02 / 06</span></div>
+  <div class="hd">
+    <span class="num">01</span><img class="ava" src="avatars/morluto.png" alt="morluto">
+    <span class="nm"><h2>REA</h2><div class="org">morluto/rea</div></span>
+    <span class="gain"><span class="lb">本期净增⭐</span><span class="v">+31,036</span></span>
+  </div>
+  <div class="oneline">先看懂，一个程序是怎么运行的。</div>
+  <div class="badges"><span class="bdg">C++ / Rust</span><span class="bdg">MIT</span><span class="bdg">周榜第 1</span><span class="bdg">2 年</span></div>
+  <div class="cols">
+    <div class="panel">
+      <div class="step"><div class="t">① 接入调试器</div><div class="d">挂上目标程序，REA 把符号、内存与调用栈整理成上下文</div></div>
+      <div class="step"><div class="t">② 查看函数与行为</div><div class="d">配合 Hopper、Ghidra 等分析工具，Agent 逐函数读程序逻辑</div></div>
+      <div class="step"><div class="t">③ 输出分析结果</div><div class="d">整理成附带证据的分析报告，而不是猜测</div></div>
+    </div>
+    <div class="right">
+      <div class="desc">连接 Hopper、Ghidra 等分析工具，帮 Agent 查看函数、程序行为和运行线索，再整理成附带证据的分析结果。做逆向与软件分析时，它是把「看汇编」变成「看逻辑」的那一层。</div>
+      <div class="cat">软件分析与排查</div>
+    </div>
+  </div>
+  <div class="points">
+    <p><span class="k">▸</span>把调试器、反汇编器统一成 Agent 可读取的上下文</p>
+    <p><span class="k">▸</span>分析结论带证据链，可复核</p>
+    <p><span class="k">▸</span>月增 42.6 万星量级的周榜第一，讨论热度高</p>
+  </div>
+  <div class="warn"><span class="k">⚠</span>分析结果仍要人工复核，别直接拿去做破坏性操作。</div>
+  <div class="foot"><span class="repo">morluto/rea</span><span class="pg">02 / 06</span></div>
+</section>
+
+<section id="c3" class="card-page">
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">03 / 06</span></div>
+  <div class="hd">
+    <span class="num">02</span><img class="ava" src="avatars/gathin23.png" alt="Gathin23">
+    <span class="nm"><h2>CleanYourTV</h2><div class="org">Gathin23/cleanyourtv</div></span>
+    <span class="gain"><span class="lb">本期净增⭐</span><span class="v">+13,165</span></span>
+  </div>
+  <div class="oneline">给电视换个清爽桌面，常用应用更好找。</div>
+  <div class="badges"><span class="bdg">Kotlin</span><span class="bdg">开源协议</span><span class="bdg">周榜第 2</span><span class="bdg">8 个月</span></div>
+  <div class="cols">
+    <div class="panel">
+      <div class="step"><div class="t">① 接入设备</div><div class="d">通过 ADB 连接 Android TV / Google TV 设备</div></div>
+      <div class="step"><div class="t">② 整理应用入口</div><div class="d">把常用应用聚到一个清爽的桌面主题里</div></div>
+      <div class="step"><div class="t">③ 停用预装服务</div><div class="d">按需停用预装服务，支持备份与恢复</div></div>
+    </div>
+    <div class="right">
+      <div class="desc">面向 Android TV 和 Google TV。可替换电视桌面，整理应用入口，并通过 ADB 停用部分预装服务，支持备份与恢复。</div>
+      <div class="cat">电视桌面整理</div>
+    </div>
+  </div>
+  <div class="points">
+    <p><span class="k">▸</span>电视桌面一键清爽，常用应用集中管理</p>
+    <p><span class="k">▸</span>预装服务可停用可恢复，不怕翻车</p>
+  </div>
+  <div class="warn"><span class="k">⚠</span>ADB 操作前务必备份，个别机型恢复不完整。</div>
+  <div class="foot"><span class="repo">Gathin23/cleanyourtv</span><span class="pg">03 / 06</span></div>
+</section>
+
+<section id="c4" class="card-page">
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">04 / 06</span></div>
+  <div class="hd">
+    <span class="num">03</span><img class="ava" src="avatars/dshorg.png" alt="dsh">
+    <span class="nm"><h2 class="long">dsh-our-free-model</h2><div class="org">dshorg/dsh-our-free-model</div></span>
+    <span class="gain"><span class="lb">本期净增⭐</span><span class="v">+11,375</span></span>
+  </div>
+  <div class="oneline">免费模型也接得进，路由一行就配好。</div>
+  <div class="badges"><span class="bdg">TypeScript</span><span class="bdg">MIT</span><span class="bdg">周榜第 3</span><span class="bdg">半年</span></div>
+  <div class="cols">
+    <div class="panel">
+      <div class="step"><div class="t">① 配置模型</div><div class="d">把免费模型端点写进路由配置，按 key 切换</div></div>
+      <div class="step"><div class="t">② 接入调用</div><div class="d">现有代码不改调用方式，底层走新路由</div></div>
+      <div class="step"><div class="t">③ 按量切换</div><div class="d">预算内跑免费模型，超出再切付费</div></div>
+    </div>
+    <div class="right">
+      <div class="desc">为 dsh 添加模型接入功能：把各家免费模型接进统一路由，配置一行切换，调用侧无感。</div>
+      <div class="cat">模型接入与路由</div>
+    </div>
+  </div>
+  <div class="points">
+    <p><span class="k">▸</span>免费模型接入成本低，配置即可用</p>
+    <p><span class="k">▸</span>路由层统一，切换模型不动业务代码</p>
+  </div>
+  <div class="warn"><span class="k">⚠</span>免费端点限流与可用性不稳定，关键链路留付费兜底。</div>
+  <div class="foot"><span class="repo">dshorg/dsh-our-free-model</span><span class="pg">04 / 06</span></div>
+</section>
+
+<section id="c5" class="card-page">
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">05 / 06</span></div>
+  <div class="hd">
+    <span class="num">04</span><img class="ava" src="avatars/impeccable.png" alt="impeccable">
+    <span class="nm"><h2>Impeccable</h2><div class="org">sample-org/impeccable</div></span>
+    <span class="gain"><span class="lb">本期净增⭐</span><span class="v">+10,681</span></span>
+  </div>
+  <div class="oneline">网页做出来了，字体、配色、间距差在哪它说了算。</div>
+  <div class="badges"><span class="bdg">Skill</span><span class="bdg">开源协议</span><span class="bdg">周榜第 4</span><span class="bdg">3 个月</span></div>
+  <div class="cols">
+    <div class="panel">
+      <div class="step"><div class="t">① 装入 Skill</div><div class="d">作为 Agent Skill 装进助手，指向你的网页</div></div>
+      <div class="step"><div class="t">② 逐项调优</div><div class="d">字体、配色、间距逐项给指令，逐屏改</div></div>
+      <div class="step"><div class="t">③ 设计体检</div><div class="d">反向检查页面有哪些设计问题并出清单</div></div>
+    </div>
+    <div class="right">
+      <div class="desc">网页做出来了，但字体、配色、间距总差点意思，可以让它逐项调整。也能帮你检查页面有哪些设计问题。</div>
+      <div class="cat">网页设计与体检</div>
+    </div>
+  </div>
+  <div class="points">
+    <p><span class="k">▸</span>设计指令直接改页面，逐项可控</p>
+    <p><span class="k">▸</span>能反向体检：把设计问题列成清单</p>
+  </div>
+  <div class="warn"><span class="k">⚠</span>改的是样式不是逻辑，上线前仍要人工过一遍交互。</div>
+  <div class="foot"><span class="repo">sample-org/impeccable</span><span class="pg">05 / 06</span></div>
+</section>
+
+<section id="c6" class="card-page">
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">06 / 06</span></div>
+  <div class="hd">
+    <span class="num">05</span><img class="ava" src="avatars/togetherai.png" alt="togetherai">
+    <span class="nm"><h2>Hallmark</h2><div class="org">togetherai/hallmark</div></span>
+    <span class="gain"><span class="lb">本期净增⭐</span><span class="v">+10,377</span></span>
+  </div>
+  <div class="oneline">按需求选视觉主题，新页面改版一套全包。</div>
+  <div class="badges"><span class="bdg">Skill</span><span class="bdg">开源协议</span><span class="bdg">周榜第 5</span><span class="bdg">2 个月</span></div>
+  <div class="cols">
+    <div class="panel">
+      <div class="step"><div class="t">① 选主题</div><div class="d">内置不同风格的视觉主题，按需求选一个</div></div>
+      <div class="step"><div class="t">② 出页面</div><div class="d">新页面直接按主题生成，风格统一</div></div>
+      <div class="step"><div class="t">③ 改版</div><div class="d">拿现有网页来改版，套用同款主题</div></div>
+    </div>
+    <div class="right">
+      <div class="desc">Together AI 出品。里面有不同风格的视觉主题，可以按需求做页面，也能拿现有网页来改版。</div>
+      <div class="cat">视觉主题与改版</div>
+    </div>
+  </div>
+  <div class="points">
+    <p><span class="k">▸</span>主题库覆盖多种风格，换皮不用重做</p>
+    <p><span class="k">▸</span>新旧页面都能套用，风格一致</p>
+  </div>
+  <div class="warn"><span class="k">⚠</span>主题偏展示向，数据密集型页面要自行调密度。</div>
+  <div class="foot"><span class="repo">togetherai/hallmark</span><span class="pg">06 / 06</span></div>
+</section>
+
+</body>
+</html>

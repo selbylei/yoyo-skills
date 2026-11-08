@@ -11,7 +11,7 @@
 
 | 配置 | 说明 |
 |---|---|
-| 工作目录 | 卡片工作目录（**任意目录，不需要 hypit 项目**）：`assets/cards/cards.html`（设计+内容源，首用由 agent 按下方版式+设计令牌节生成）、`assets/cards/avatars/`（头像缓存，可空）、`scripts/check-cards.mjs`（体检脚本，随本 skill 分发）。出图管线用全局 `hypit` CLI，与任何项目无关 |
+| 工作目录 | 卡片工作目录（**任意目录，不需要 hypit 项目**）：`assets/cards/cards.html`（设计+内容源；首用模板随 skill 分发）、`assets/cards/avatars/`（头像缓存，可空）、`scripts/check-cards.mjs`（体检脚本，随本 skill 分发）。出图管线用全局 `hypit` CLI，与任何项目无关 |
 | 内容源 | 每期日报目录 `<...>/GitHub-Trending/<YYYY-MM-DD>.md`，每项目含 一句话简介/Stars/语言/许可/亮点/注意 |
 | 出图目录 | 固定 `<工作目录>/assets/cards/01-06.png`（1242×1656，抖音图文 3:4） |
 
@@ -21,7 +21,7 @@
 
 1. 装 hypit CLI：`npm i -g @hypit/hypit`，验 `hypit --version`
 2. 选/建任意目录作「工作目录」：`mkdir -p <工作目录>/assets/cards/avatars <工作目录>/scripts`
-3. 三份产物全部本机可得（**无需从任何机器搬移**）：① `check-cards.mjs` 从本 skill 目录 `scripts/` 拷入工作目录 `scripts/`；② `avatars/` 留空即可，出图流程会自动补；③ `cards.html` 首用时由 agent 按「版式 + 设计令牌」两节生成（内容每期填充；如需像素级对齐定稿版式，取原配置机当前版作模板一次性拷入，之后不再依赖它）
+3. 三份产物全部本机可得（**无需从任何机器搬移**）：① `check-cards.mjs` 从本 skill 目录 `scripts/` 拷入工作目录 `scripts/`；② `avatars/` 留空即可，出图流程会自动补；③ `cards.html` 随 skill 分发，拷 `<skill目录>/assets/cards.html` 到工作目录 `assets/cards/`（首用模板 = 版式参考版 + 占位内容，每期替换内容；版式已按参考帖像素采样重建并体检通过）
 4. 定位/新建内容源：优先找该机已有的 `GitHub-Trending/` 日报目录（如 obsidian 个人文档）；没有就问用户每期日报存哪，要能跨机分发才建进 obsidian 库
 5. 字体：查 Noto Sans SC（mac 查系统字体目录或 `system_profiler SPFontsDataType`；Linux 用 `fc-list | grep -i "noto sans sc"`），没有就装或按依赖节降级（mac 无 Noto Sans SC 时用 PingFang SC）
 6. 把三值写入 `<工作目录>/assets/cards/local.md`（格式：三行 `key: value`），汇报取值来源后继续出图流程
@@ -32,10 +32,10 @@
 
 | 是什么 | 位置（相对配置区） |
 |---|---|
-| 设计+内容唯一源 | `<工作目录>/assets/cards/cards.html`（6 个 `<section id="c1..c6">`，各 1242×1656） |
+| 设计+内容唯一源 | `<工作目录>/assets/cards/cards.html`（6 个 `<section id="c1..c6">`，各 1242×1656）；首用模板随 skill 分发 `<skill目录>/assets/cards.html`（版式参考版 + 占位内容，2026-11-08 按参考帖重建：体检全 0 + 与参考图并排目检通过） |
 | 头像 | `<工作目录>/assets/cards/avatars/<owner>.png`（已存在的直接复用） |
 | 体检脚本 | 随 skill 分发：`<skill目录>/scripts/check-cards.mjs`（部署时拷入工作目录 `scripts/`；2026-11-08 本机实测过通过/横向/纵向三条路径） |
-| 参考图 | 不入仓（本机可存 `<skill目录>/references/7703407329438531791/`，`all/slide-01..06.webp` + 采样脚本）；签名 URL 会过期（`x-expires`），有本地图就绝不重拉 |
+| 参考图 | 不入仓（`<skill目录>/references/7703407329438531791/`：`all/slide-01..06.webp` + `sampling.py`；2026-11-08 本机已抓取，6 张全 1242×1656）；签名 URL 会过期（`x-expires`），有本地图就绝不重拉 |
 
 ## 版式（勿改，只填内容）
 
