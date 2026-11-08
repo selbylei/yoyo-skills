@@ -5,26 +5,28 @@
 ## 配置（三值：工作目录 / 内容源 / 出图目录）
 
 **取值优先级**（取到即停）：
-1. 用户会话中给的机器值（说「本机 hypit 在 …」时用它的）
+1. 用户会话中给的机器值（说「本机卡片工作目录在 …」时用它的）
 2. 本地配置文件 `<工作目录>/assets/cards/local.md`（机器级，不进仓；只存三行路径，首次部署时写）
 3. 都没有 → 先跑「新机器部署」补齐再开工
 
 | 配置 | 说明 |
 |---|---|
-| 工作目录 | hypit 项目根：管线工具 `hypit capture`、`assets/cards/cards.html`、`avatars/` 都在此 |
+| 工作目录 | 卡片工作目录（**任意目录，不需要 hypit 项目**）：含 `assets/cards/cards.html`（设计+内容源）、`assets/cards/avatars/`（头像缓存，可空）、`scripts/check-cards.mjs`（体检脚本）。出图管线用全局 `hypit` CLI，与任何项目无关 |
 | 内容源 | 每期日报目录 `<...>/GitHub-Trending/<YYYY-MM-DD>.md`，每项目含 一句话简介/Stars/语言/许可/亮点/注意 |
 | 出图目录 | 固定 `<工作目录>/assets/cards/01-06.png`（1242×1656，抖音图文 3:4） |
 
-**依赖**：hypit CLI、Chrome（`hypit capture` 带 `--channel chrome`）、图片尺寸校验工具（ffprobe 或等价）、Noto Sans SC 字体（本机没有时换同类 CJK 无衬线，勿换回 YaHei）。
+**依赖**：hypit CLI（`npm i -g @hypit/hypit`；`hypit capture screenshot` 是独立命令，可直接截本地 HTML 文件，**不依赖 hypit 项目工程**）、Chrome（`hypit capture` 带 `--channel chrome`）、图片尺寸校验工具（ffprobe 或等价）、Noto Sans SC 字体（本机没有时换同类 CJK 无衬线，勿换回 YaHei）。
 
 ### 新机器部署（配置缺失时）
 
-1. clone 用户的 hypit 项目到任意目录（路径记下来，就是「工作目录」；clone 地址问用户或查其仓库台账）
-2. 定位/新建内容源：优先找该机已有的 `GitHub-Trending/` 日报目录（如 obsidian 个人文档）；没有就问用户每期日报存哪，要能跨机分发才建进 obsidian 库
-3. 字体：查 Noto Sans SC（`fc-list | grep -i "noto sans sc"` 或系统字体目录），没有就装或按依赖节降级
-4. 把三值写入 `<工作目录>/assets/cards/local.md`（格式：三行 `key: value`），汇报取值来源后继续出图流程
+1. 装 hypit CLI：`npm i -g @hypit/hypit`，验 `hypit --version`
+2. 选/建任意目录作「工作目录」：`mkdir -p <工作目录>/assets/cards/avatars <工作目录>/scripts`
+3. 取三个产物（从原配置机拷贝，或日后从本仓取；**不 clone 任何 hypit 项目**）：`cards.html` → `assets/cards/`、`check-cards.mjs` → `scripts/`、`avatars/`（没有就跳过，出图流程会自动下载缺的头像）
+4. 定位/新建内容源：优先找该机已有的 `GitHub-Trending/` 日报目录（如 obsidian 个人文档）；没有就问用户每期日报存哪，要能跨机分发才建进 obsidian 库
+5. 字体：查 Noto Sans SC（mac 查系统字体目录或 `system_profiler SPFontsDataType`；Linux 用 `fc-list | grep -i "noto sans sc"`），没有就装或按依赖节降级（mac 无 Noto Sans SC 时用 PingFang SC）
+6. 把三值写入 `<工作目录>/assets/cards/local.md`（格式：三行 `key: value`），汇报取值来源后继续出图流程
 
-（原始配置机 `win` 的取值：工作目录 `F:\learn\hypit`，内容源 `F:\obsidian\个人文档\数据采集\GitHub-Trending\`；该机的 local.md 可直接抄这两行。）
+（原始配置机 `win` 的取值：工作目录 `F:\learn\hypit`（该机的恰好是 hypit 项目，但管线只用到里面的 `assets/cards/` 和 `scripts/check-cards.mjs`；新机器照上面 1-6 步部署即可，不必 clone 该项目），内容源 `F:\obsidian\个人文档\数据采集\GitHub-Trending\`。）
 
 ## 事实源与产物
 
