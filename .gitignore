@@ -16,6 +16,9 @@ TODO.md
 .opencode/
 skills-lock.json
 
+# 参考图（签名 URL 产物，本机留存，不进仓）
+skills/yoyo-github-cards/references/
+
 # 系统 / 通用
 .DS_Store
 node_modules/
