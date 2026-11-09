@@ -1,3 +1,8 @@
+---
+name: yoyo-github-cards
+description: GitHub 热门排行六卡图文（抖音图文素材）：在任意项目根目录跑 `node <skill>/scripts/fetch-weekly.mjs` 一把抓周榜（全站+语言分榜并集按周净增 TOP10）→ 产物全在 <项目根>/.github-cards/（data.json/头像/README/cards.html 草稿），agent 补文案后体检+出图 01-06.png（1242×1656）。用户说「出本周 GitHub 周榜/涨星榜/周榜卡片/把当前项目出周榜六卡」时使用。日榜 TOP5 单项目版是旧流程；热点抓取、文案发布、抖音上传不在范围。
+---
+
 # GitHub 六卡图文管线
 
 两种版式（均已定稿，之后各期只换内容不动版式；版式取自参考帖 7703407329438531791 像素采样）：
