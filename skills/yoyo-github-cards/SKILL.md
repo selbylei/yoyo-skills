@@ -20,7 +20,7 @@
 | 4 出图 | `for i in 1..6: rm -f .github-cards/NN.png && hypit capture screenshot <项目根>/.github-cards/cards.html --selector "#c$i" --to ".github-cards/NN.png" --viewport 1242x1656 --channel chrome`（拒覆盖，先删） |
 | 5 验+汇报 | ffprobe 验 1242×1656；汇报 ≤5 行：出图位置 + 待用户 ①目检 ②上传文案（标题/正文一句话串 10 项/话题 `#GitHub #开源项目 #开源 #AI工具 #开发工具`）；上传抖音图文由用户自己操作 |
 
-**口径**（11-08 定）：TOP10 = 全站 + 10 语言分榜 since=weekly 并集按周净增排序（不用官方列表顺序）；周榜读数随时段漂移（trending 页会重渲染），**以当次抓取为准**；周榜不套日报「零 Agent 技能类」排除，技能/平台类按本体收录、卡内 ⚠ 标注本体属性。
+**口径**（11-08 定）：TOP10 = 全站 + 10 语言分榜 since=weekly 并集按周净增排序（不用官方列表顺序）；周榜读数随时段漂移（trending 页会重渲染），**以当次抓取为准**；周榜不套日报「零 Agent 技能类」排除，技能/平台类按本体收录、卡内 ⚠ 标注本体属性。所有 TODO（含 c1 短标签）由 agent 读 readmes 后每期人工补齐，**不用英文 API desc 截断兜底**（11-08 用户定）。
 
 ## 日榜版（旧流程）
 
