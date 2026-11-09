@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>GitHub 周榜 TOP10 六卡模板（双项版式 · 占位内容，fetch-weekly.mjs 填充）</title>
+<!--
+  周榜 TOP10 双项版式（2026-11-08 定稿，参照参考帖 7703407329438531791 slide-03）：
+  c1 十行排行 + c2-c6 每卡 2 项。{{占位符}} 由 scripts/fetch-weekly.mjs 机械填充；
+  TODO 文案（一句话/亮点/注意/面板/描述）由 agent 读 readmes/ 与 data.json 后填写。
+  设计令牌勿凭记忆改：bg #fafbf8 / 蓝 #174bb9 / 线 #dadad8 / 面板 #f1f4ff。字体 Noto Sans SC（缺则同类 CJK 无衬线）。
+-->
+<style>
+:root{
+  --bg:#fafbf8; --ink:#000; --gray:#7a7a7a; --gray2:#7e7e7e; --note:#6d6d6d;
+  --line:#dadad8; --panel:#f1f4ff; --blue:#174bb9; --red:#e13d59;
+  --tint1:#fceeec; --tint2:#fcf6e6; --tint3:#edf2fe;
+  --mono:Consolas,"SF Mono",Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink)}
+section{width:1242px;height:1656px;position:relative;overflow:hidden;background:var(--bg);
+  padding:0 92px 0;display:flex;flex-direction:column}
+
+/* ---------- 公共：顶栏 ---------- */
+.topbar{display:flex;justify-content:space-between;align-items:center;
+  padding-top:64px;padding-bottom:23px;border-bottom:1px solid var(--line)}
+.topbar .brand{font-size:26px;font-weight:600}
+.topbar .brand b{color:var(--blue);font-weight:800}
+.topbar .pg{font-family:var(--mono);font-size:24px;font-weight:700}
+
+/* ---------- c1 封面（周榜 TOP10 十行） ---------- */
+#c1{padding-bottom:56px}
+.hero{margin-top:44px;line-height:1.28;font-weight:900}
+.hero .l1,.hero .l2{font-size:104px}
+.hero .topN{color:var(--blue);position:relative;margin-left:26px;padding-bottom:14px}
+.hero .topN::after{content:"";position:absolute;left:0;right:0;bottom:0;height:12px;background:var(--red)}
+.lang{margin-top:24px;font-size:24px;color:var(--note)}
+.meta{margin-top:14px;font-family:var(--mono);font-size:28px;font-weight:800}
+.rank{margin-top:16px;flex:1;display:flex;flex-direction:column;
+  border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff}
+.rank-head{display:flex;justify-content:space-between;align-items:center;
+  height:54px;padding:0 28px;font-size:22px;color:var(--gray);font-weight:600;background:#fff}
+.rank-head .star{color:var(--gray)}
+.row{flex:1;display:flex;align-items:center;gap:20px;padding:0 28px;
+  border-top:1px solid var(--line);min-height:0}
+.row.r1{background:var(--tint1)} .row.r2{background:var(--tint2)} .row.r3{background:var(--tint3)}
+.row .num{font-family:var(--mono);font-size:30px;font-weight:800;color:var(--blue);width:48px;flex:0 0 48px}
+.row .ava{width:44px;height:44px;border-radius:10px;object-fit:cover;flex:0 0 44px}
+.row .nm{flex:1;min-width:0}
+.row .name{font-size:27px;font-weight:900;line-height:1.2}
+.row .od{font-size:15px;color:var(--gray);margin-top:2px}
+.row .stars{font-family:var(--mono);font-size:27px;font-weight:800}
+
+/* ---------- c2-c6 双项页（11-08 周榜期版式） ---------- */
+.card-page{padding-bottom:129px}
+.ihead{display:flex;align-items:center;gap:22px;margin-top:30px;min-height:78px}
+.ihead + .ihead{margin-top:0}
+.ihead .num{font-family:var(--mono);font-size:36px;font-weight:800;color:var(--blue);width:60px;flex:0 0 60px}
+.ihead .ava{width:56px;height:56px;border-radius:14px;object-fit:cover;flex:0 0 56px}
+.ihead .nm{flex:1;min-width:0}
+.ihead h2{font-size:72px;font-weight:900;line-height:1.05}
+.ihead h2.long{font-size:40px}
+.ihead .org{font-family:var(--mono);font-size:18px;color:var(--gray);margin-top:5px}
+.gain{margin-left:auto;text-align:right;flex:0 0 auto}
+.gain .lb{font-size:19px;color:var(--gray)}
+.gain .v{font-family:var(--mono);font-size:38px;font-weight:800;color:var(--blue);margin-top:3px}
+.oneline{margin-top:14px;font-size:34px;font-weight:900;line-height:1.28}
+.badges{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.bdg{font-size:20px;font-weight:600;padding:8px 18px;border-radius:12px;background:#f2f2ef;color:#111}
+.bdg:first-child{background:var(--blue);color:#fff}
+.cols{display:flex;gap:34px;margin-top:16px;align-items:stretch}
+.panel{flex:0 0 452px;width:452px;background:var(--panel);border-radius:20px;padding:26px}
+.step{margin-bottom:12px}
+.step:last-child{margin-bottom:0}
+.step .t{font-size:24px;font-weight:800}
+.step .d{font-size:18px;color:var(--note);margin-top:3px;line-height:1.45}
+.cols .right{flex:1;min-width:0;display:flex;flex-direction:column}
+.cols .desc{font-size:21px;color:var(--gray2);line-height:1.6}
+.cols .cat{font-size:25px;font-weight:800;color:var(--blue);margin-top:auto;padding-top:14px}
+.points{margin-top:10px}
+.points p{font-size:21px;line-height:1.45;font-weight:500;margin-bottom:2px}
+.points .k{color:var(--blue);font-weight:800;margin-right:10px}
+.warn{margin-top:8px;font-size:19px;color:var(--gray)}
+.warn .k{margin-right:8px}
+.foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center}
+.foot .repo{font-family:var(--mono);font-size:20px;color:var(--gray)}
+.foot .pg{font-family:var(--mono);font-size:24px;font-weight:800;color:var(--blue)}
+</style>
+
+<body>
+<!-- ============ c1 封面（周榜 TOP10 排行） ============ -->
+<section id="c1">
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">01 / 06</span></div>
+  <div class="hero">
+    <div class="l1">{{HERO_L1}}</div>
+    <div class="l2">{{HERO_L2}}<span class="topN">{{HERO_TOPN}}</span></div>
+  </div>
+  <div class="lang">{{LANG_LINE}}</div>
+  <div class="meta">{{META_LINE}}</div>
+  <div class="rank">
+    <div class="rank-head"><span>GitHub 周榜 · 收录仓库净增</span><span class="star">本周净增 ⭐</span></div>
+{{C1_ROWS}}
+  </div>
+</section>
+
+<!-- ============ c2-c6 双项页（ITEM_1..ITEM_10 按卡序：c2=1,2 c3=3,4 c4=5,6 c5=7,8 c6=9,10） ============ -->
+<section id="c2" class="card-page">
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">02 / 06</span></div>
+{{ITEM_1}}
+{{ITEM_2}}
+  <div class="foot"><span class="repo">{{FOOT_1}}</span><span class="pg">02 / 06</span></div>
+</section>
+
+<section id="c3" class="card-page">
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">03 / 06</span></div>
+{{ITEM_3}}
+{{ITEM_4}}
+  <div class="foot"><span class="repo">{{FOOT_2}}</span><span class="pg">03 / 06</span></div>
+</section>
+
+<section id="c4" class="card-page">
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">04 / 06</span></div>
+{{ITEM_5}}
+{{ITEM_6}}
+  <div class="foot"><span class="repo">{{FOOT_3}}</span><span class="pg">04 / 06</span></div>
+</section>
+
+<section id="c5" class="card-page">
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">05 / 06</span></div>
+{{ITEM_7}}
+{{ITEM_8}}
+  <div class="foot"><span class="repo">{{FOOT_4}}</span><span class="pg">05 / 06</span></div>
+</section>
+
+<section id="c6" class="card-page">
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">06 / 06</span></div>
+{{ITEM_9}}
+{{ITEM_10}}
+  <div class="foot"><span class="repo">{{FOOT_5}}</span><span class="pg">06 / 06</span></div>
+</section>
+
+</body>
+</html>

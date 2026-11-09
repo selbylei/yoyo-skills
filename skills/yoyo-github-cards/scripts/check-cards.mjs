@@ -1,14 +1,26 @@
 // 六卡体检：cards.html 的 #c1..#c6 每张应为 1242×1656，纵向溢出=0、横向溢出元素=0
-// 用法：cd <工作目录> && hypit capture run scripts/check-cards.mjs --channel chrome
+// 用法：cd <项目根> && hypit capture run <skill>/scripts/check-cards.mjs --channel chrome
+// cards.html 定位（取第一个存在）：<CWD>/.github-cards/cards.html（fetch-weekly 新产物）→
+// <CWD>/assets/cards/cards.html（旧工作目录布局）→ 脚本相对 ../assets/cards/cards.html
 // 结果全走文本 log（勿逐张读图）；任一非 0 → 抛错，禁止出图
-// 脚本相对自身定位 ../assets/cards/cards.html，与工作目录结构绑定
+
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 const CARD_W = 1242;
 const CARD_H = 1656;
 const TOL = 1; // 亚像素容差
 
 export default async ({ page, log }) => {
-  const url = new URL('../assets/cards/cards.html', import.meta.url).href;
+  const candidates = [
+    resolve(process.cwd(), '.github-cards/cards.html'),
+    resolve(process.cwd(), 'assets/cards/cards.html'),
+    new URL('../assets/cards/cards.html', import.meta.url).pathname,
+  ];
+  const target = candidates.find((p) => existsSync(p));
+  if (!target) throw new Error('check-cards: 找不到 cards.html（试过 .github-cards/、assets/cards/、脚本相对路径）');
+  const url = `file://${encodeURI(target)}`;
+  log(`体检对象: ${target}`);
   await page.setViewport({ width: CARD_W, height: CARD_H });
   await page.goto(url, { waitUntil: 'load' });
 
