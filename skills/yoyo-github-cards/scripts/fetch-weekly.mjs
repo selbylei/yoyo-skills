@@ -11,6 +11,14 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+// 出网代理（本机直连 github.com 被墙的机器）：读 HTTPS_PROXY/https_proxy，用 undici ProxyAgent
+const proxyUrl = process.env.HTTPS_PROXY || process.env.https_proxy
+if (proxyUrl) {
+  const { ProxyAgent, setGlobalDispatcher } = await import('node:undici')
+  setGlobalDispatcher(new ProxyAgent(proxyUrl))
+}
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > -1 ? process.argv[i + 1] : d }
 const TOP = Number(arg('--top', 10))
@@ -124,7 +132,7 @@ async function main() {
   writeFileSync(join(OUT, 'data.json'), JSON.stringify(top.map((d, i) => ({ rank: i + 1, ...d })), null, 2))
 
   console.log('[3/5] 生成 cards.html 草稿...')
-  const tplPath = join(dirname(new URL(import.meta.url).pathname), '..', 'assets', 'cards-weekly10.html')
+  const tplPath = join(dirname(fileURLToPath(import.meta.url)), '..', 'assets', 'cards-weekly10.html')
   const tpl = readFileSync(tplPath, 'utf8')
   const cnt = top.map(d => d.lang || '?')
   const topCnt = (l) => cnt.filter(c => c === l).length
