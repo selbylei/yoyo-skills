@@ -19,7 +19,7 @@ export default async ({ page, log }) => {
   ];
   const target = candidates.find((p) => existsSync(p));
   if (!target) throw new Error('check-cards: 找不到 cards.html（试过 .github-cards/、assets/cards/、脚本相对路径）');
-  const url = `file://${encodeURI(target)}`;
+  const url = `file:///${encodeURI(resolve(target).replace(/\\/g, '/'))}`; // Windows 反斜杠会破 file:// URL
   log(`体检对象: ${target}`);
   await page.setViewport({ width: CARD_W, height: CARD_H });
   await page.goto(url, { waitUntil: 'load' });

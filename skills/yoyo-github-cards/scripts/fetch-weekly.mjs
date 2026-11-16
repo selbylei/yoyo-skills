@@ -13,20 +13,44 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-// 出网代理（本机直连 github.com 被墙的机器）：读 HTTPS_PROXY/https_proxy，用 undici ProxyAgent
+// 出网代理（本机直连 github.com 被墙的机器）：需已安装 undici（npm i undici，可放在项目或全局）；
+// 读 HTTPS_PROXY/https_proxy，没有 undici 时只告警、直连
 const proxyUrl = process.env.HTTPS_PROXY || process.env.https_proxy
 if (proxyUrl) {
-  const { ProxyAgent, setGlobalDispatcher } = await import('node:undici')
-  setGlobalDispatcher(new ProxyAgent(proxyUrl))
+  try {
+    const { ProxyAgent, setGlobalDispatcher } = await import('undici')
+    setGlobalDispatcher(new ProxyAgent(proxyUrl))
+  } catch {
+    console.warn('! 检测到代理环境变量但 undici 未安装（npm i undici），本次走直连')
+  }
 }
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > -1 ? process.argv[i + 1] : d }
 const TOP = Number(arg('--top', 10))
 const OUT = resolve(arg('--out', '.github-cards'))
 const LANGS = ['python', 'rust', 'typescript', 'javascript', 'go', 'cpp', 'c', 'java', 'swift', 'kotlin']
-const UA = { 'User-Agent': 'yoyo-github-cards-fetch/1.0' }
+const UA = { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36' } }
 
-const get = async (url) => { const r = await fetch(url, UA); if (!r.ok) throw new Error(`${url} → ${r.status}`); return r }
+// 间歇性 ECONNRESET/超时（本机 DPI 抽风）：网络错重试 3 次（退避 3s/6s）
+const get = async (url) => {
+  let last
+  for (let a = 0; a < 3; a++) {
+    try {
+      const r = await fetch(url, { ...UA, signal: AbortSignal.timeout(15000) })
+      if (r.ok) return r
+      last = new Error(`${url} → ${r.status}`)
+      if (r.status >= 400 && r.status < 500) break // 4xx 不重试
+    } catch (e) { last = e }
+    if (a < 2) await new Promise(r2 => setTimeout(r2, 3000 * (a + 1)))
+  }
+  // 兜底：node fetch 重试全败后走 curl（本机直连通道，零新增依赖，curl 各系统自带）
+  try {
+    const { execSync } = await import('node:child_process')
+    const out = execSync(`curl -sL --max-time 25 -A "yoyo-github-cards-fetch/1.0" ${JSON.stringify(url)}`, { maxBuffer: 64 * 1024 * 1024 })
+    if (out && out.length > 0) return new Response(out)
+  } catch { /* 落到 throw last */ }
+  throw last
+}
 
 function parseTrending(html) {
   const out = []
