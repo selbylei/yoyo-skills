@@ -1,0 +1,11 @@
+{
+  "name": "default-8pages",
+  "description": "默认标准流程:8 卡知识流,60-90s,纸感主题,口播对齐,竖版 1080×1920",
+  "card_count": 8,
+  "card_slots": ["C1 钩子", "C2 概念A", "C3 概念A延伸", "C4 概念B", "C5 对比/表格", "C6 收口", "C7 概念C", "C8 CTA"],
+  "theme": "paper",
+  "tts": { "voice": "zh-CN-YunxiNeural", "rate": "+10%", "words_per_min": 240 },
+  "duration_target_s": [60, 90],
+  "output": { "video": "video_{episode}.mp4", "aspect": "1080x1920", "fps": 30 },
+  "publish": { "channel": "抖音", "steps_ref": "doc/发布流程.md", "cover": "第 1 帧(C1 钩子卡)" }
+}
