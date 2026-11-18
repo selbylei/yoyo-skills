@@ -4,6 +4,8 @@
 产物:<同目录>/tts.mp3 + boundaries.json([{"text","offset_ms","duration_ms"}, ...])
 """
 import asyncio, json, os, sys
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # GBK 控制台打 ✓ 不崩
 import edge_tts
 
 DEFAULT_VOICE, DEFAULT_RATE = "zh-CN-YunxiNeural", "+10%"
