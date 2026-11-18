@@ -1,61 +1,56 @@
 ---
 name: yoyo-github-cards
-description: GitHub 热门排行六卡图文（抖音图文素材）：在任意项目根目录跑 `node <skill>/scripts/fetch-weekly.mjs` 一把抓周榜（全站+语言分榜并集按周净增 TOP10）→ 产物全在 <项目根>/.github-cards/（data.json/头像/README/cards.html 草稿），agent 补文案后体检+出图 01-06.png（1242×1656）。用户说「出本周 GitHub 周榜/涨星榜/周榜卡片/把当前项目出周榜六卡」时使用。日榜 TOP5 单项目版是旧流程；热点抓取、文案发布、抖音上传不在范围。
+description: github-trending 热榜期出片（ai_ask 项目日榜 TOP5 视频）：抓当日 GitHub 日榜 → 选 5 仓定主线 → 8 卡 paper 主题 cards.json → edge-tts 口播 + 音画对齐 → classic 成片 + HyperFrames 动效版双管线 → 抽帧验 + 提交。用户说「出今天/某天的 github-trending」「出一期热榜视频」「epNN 出片」时使用。周榜六卡图文（1242×1656 图文素材）不在本 skill 范围。
 ---
 
-# GitHub 六卡图文管线
+# github-trending 热榜期出片（日榜 TOP5 → 双管线视频）
 
-两种版式（均已定稿，之后各期只换内容不动版式；版式取自参考帖 7703407329438531791 像素采样）：
-- **周榜 TOP10 双项版**（11-08 起主线）：c1 十行排行 + c2-c6 每卡 2 项；数据源 = GitHub 周榜（全站 + 语言分榜并集按周净增排序）
-- **日榜 TOP5 单项目满版页**（旧流程）：c2-c6 每卡 1 项目；数据源 = 每期日报 `GitHub-Trending/<date>.md`
+作用域：仅 `F:/learn/ai_ask/github-trending/<date>/` 日榜视频期（每周一期，期号 = 顺延）。周榜/图文六卡不是本 skill 的活。
 
-设计令牌（勿凭记忆改）：bg `#fafbf8` / 蓝 `#174bb9` / 线 `#dadad8` / 面板 `#f1f4ff` / top3 行底 `#fceeec #fcf6e6 #edf2fe`；正文 **Noto Sans SC**（缺则同类 CJK 无衬线，mac 用 PingFang SC，勿换回 YaHei），等宽 **Consolas**。
+## 前置事实
 
-## 周榜快跑（零依赖布局，推荐）
+- 工作目录 `github-trending/<date>/`（date = 系统时钟当天）；期号看 TODO.md 最近一期 +1；主线/选品历史看 TODO.md 各期行
+- 上期目录照抄：`classic/paper-bg.jpg` 拷过来（cards.json 的 `bg_image` 引用它）
+- 期目录结构：`classic/`(cards.json, tts.txt, tts.mp3, boundaries.json, cards_html/, cards_png/, video_NN.mp4) + `hyperframes/`(index.html, assets/, renders/) + `readmes/` + `check_*_tNN.png`
+- 发布：用户照 `doc/发布流程.md`；封面 = `classic/cards_png/card01.png`（= 成片第 1 帧，发布预览里选第 1 帧即可，不用传图）
 
-**效果**：在任意项目根目录一条命令出数据 + 草稿，产物全在 `<项目根>/.github-cards/`，不依赖 hypit 项目、不建任何前置目录、不需要 local.md。
+## 管线（8 步）
 
-**一次性前提**：node ≥18 + `npm i -g @hypit/hypit`（出图引擎）+ Chrome + ffprobe（或等价尺寸校验）。
+| 步 | 命令/动作 | 产物 |
+|---|---|---|
+| 1 抓取 | `python tools/trending_fetch.py`（**强制走代理**，见坑#1）→ `github-trending/fetch/trending-<date>.json`（24h 榜+周榜 26 页） | fetch json |
+| 2 选品 | 读 `top5_24h`（全站+语言分榜并集按 24h 净增）+ 周榜补强；定 5 仓 + 一条主线（如「agent 值一整班」）；license 为 NOASSERTION 的翻 LICENSE 原文定性 | 选品清单 |
+| 3 REST+README | `tf.repo_detail(repo)` × 5（直接调函数，见坑#3）写回 fetch json `repos`；README raw 抓前 200 行存 `<date>/readmes/` | repos 明细 + readmes |
+| 4 cards.json | `<date>/classic/cards.json`：episode 号、theme paper、flow `flows/default-8pages.json`、`foot_right`/`h1font`/`bg_image` 照抄上期；8 卡 = C1 钩子（封面+列表合并）+ 5×PROJECT 01-05 + SUMMARY + CTA；每卡 say/duration 占位（align 会改写） | cards.json |
+| 5 TTS | say 全部**单行拼接**写 `tts.txt` → `python tools/tts.py <date>/classic/tts.txt flows/default-8pages.json` | tts.mp3 + boundaries.json |
+| 6 对齐+classic | `python tools/align.py <date>/classic/cards.json`（自动写回时长 + cards.py 重渲染 8 卡 + assemble.py 合成） | video_NN.mp4 |
+| 7 HF 动效 | `python tools/gen_hf.py github-trending/<date>/classic` → `set -a && . ./skill-lab/.env && cd <date>/hyperframes && npx --yes hyperframes@0.8.91 render`（~10-12min，**跑前告知用户**） | hyperframes/renders/*.mp4 |
+| 8 验+提交 | imageio-ffmpeg ffprobe 验两版（h264+aac 1080×1920 30fps）；抽帧 t=12/50/100 落盘 `check_{classic,hf}_tNN.png`；TODO.md 补期行；`git add github-trending/<date> TODO.md` 提交（**不加 fetch/**，见坑#4） | commit |
 
-| 步 | 做什么 |
-|---|---|
-| 1 数据+草稿 | `cd <项目根> && node <skill>/scripts/fetch-weekly.mjs [--top 10]` → `.github-cards/`：`data.json`（TOP N 全字段）、`avatars/`（owner 头像现抓）、`readmes/`（各仓 README 前 200 行）、`cards.html` 草稿（机械字段已填：序号/头像/星数/周净增/语言/许可/年龄/榜单徽标，长名自动加 `.long`；余 ~81 处 TODO 文案） |
-| 2 填文案 | agent 读 `.github-cards/readmes/*` + `data.json`，替换 cards.html 中 TODO：一句话简介（≤20 字）/ c1 短标签（≤10 字）/ 面板 3 步流程 / 描述 2-3 行 / 蓝色分类 / 亮点 1-2 条 / ⚠ 注意 1 行。质量要求同日榜版（亮点要具体、注意要可操作） |
-| 3 体检 | `cd <项目根> && hypit capture run <skill>/scripts/check-cards.mjs --channel chrome`（自动定位 `.github-cards/cards.html`，旧 `assets/cards/` 布局也认）→ 6/6 全 0 才出图（数值走文本判断，别逐张读图进上下文；目检拼 1 张 montage） |
-| 4 出图 | `for i in 1..6: rm -f .github-cards/NN.png && hypit capture screenshot <项目根>/.github-cards/cards.html --selector "#c$i" --to ".github-cards/NN.png" --viewport 1242x1656 --channel chrome`（拒覆盖，先删） |
-| 5 验+汇报 | ffprobe 验 1242×1656；汇报 ≤5 行：出图位置 + 待用户 ①目检 ②上传文案（标题/正文一句话串 10 项/话题 `#GitHub #开源项目 #开源 #AI工具 #开发工具`）；上传抖音图文由用户自己操作 |
+## 文案规则（口播/cards，既定不重议）
 
-**口径**（11-08 定）：TOP10 = 全站 + 10 语言分榜 since=weekly 并集按周净增排序（不用官方列表顺序）；周榜读数随时段漂移（trending 页会重渲染），**以当次抓取为准**；周榜不套日报「零 Agent 技能类」排除，技能/平台类按本体收录、卡内 ⚠ 标注本体属性。所有 TODO（含 c1 短标签）由 agent 读 readmes 后每期人工补齐，**不用英文 API desc 截断兜底**（11-08 用户定）。
+- star 语义 = **收藏/星**，口播与文案说「收藏/★」，不说「分」
+- 首页(封面)与列表页合并为一张 C1 卡，不出稀首页
+- 口播不用「拆/拆解」，用「推荐/看」；开头句式「今天推荐5个GitHub热门项目」
+- C1 钩子要有本期主线（一句把 5 项串起来的判断），SUMMARY 收口回扣主线；CTA 固定三行（每天推荐5个 / 项目名在卡片上去GitHub搜 / 评论区扣1）
+- 每仓 3 条 items 要具体（数字/对比/边界），⚠ 注意要可操作（许可坑/自托管前提/授权边界等）
 
-## 日榜版（旧流程）
+## 坑（全部 2026-11-17 ep13 实测踩过）
 
-- 内容源 = 每期日报 `GitHub-Trending/<YYYY-MM-DD>.md`（Top5：一句话/星数/净增/语言/许可/亮点/注意/榜单徽标）
-- 设计+内容源 `<工作目录>/assets/cards/cards.html`（单项目满版页模板，随 skill 分发 `<skill目录>/assets/cards.html`）；头像 `assets/cards/avatars/<owner>.png`（缺的从 API `avatar_url` 现拉）
-- 填内容 → 体检 → 出图 → 验尺寸 → 汇报，步骤同周榜快跑 3-5（体检/出图路径改 `assets/cards/`）
-- 机器固定工作目录可写 `<工作目录>/assets/cards/local.md`（三行 `key: value`：工作目录/内容源/出图目录）；不写就用 CWD 布局
+1. **直连抖慢 → 抓取超时**：trending_fetch 先探直连（10s 内响应判健康），直连偶发 20+s/页，26 页必超 900s。跑法：`import importlib.util` 加载脚本后 `tf._direct_healthy = lambda: False` 强制代理再 `tf.main()`（代理 ~5s/页，全程 ~155s）
+2. **本机 `python3` 是 WindowsApps 商店 stub**：静默退出码 49 不干活。所有工具链一律 `python`（C:/python312/python）；命令退 49 先怀疑它
+3. **`--repos` 不能单独跑**：main() 只吃 sys.argv、且会重抓全部榜单页。REST 明细直接 `tf.repo_detail(owner/name)` 循环调，结果写回 fetch json 的 `repos` 键
+4. **git add 忽略路径会断 && 链**：`github-trending/fetch/` 在 .gitignore（本地草稿不入库）。add 时只列有效路径，否则「The following paths are ignored」使 add 退 1、`&&` 后续 commit 全部不执行
+5. **tts.mp3 24kHz mono**：正常值（edge-tts 原声），发布流程异常预案里的 44.1kHz 重包只在抖音报音频不兼容时才做
+6. **HF render 是重资源**（~11min CPU 密集）：跑前告知；renders/ 在 gitignore（成片留本地，不进库）
 
-## 事实源与产物
+## 事实源
 
 | 是什么 | 位置 |
 |---|---|
-| 双项模板（周榜版） | `<skill目录>/assets/cards-weekly10.html`（占位符由 fetch-weekly.mjs 填充） |
-| 单项目模板（日榜版） | `<skill目录>/assets/cards.html` |
-| 数据+草稿脚本 | `<skill目录>/scripts/fetch-weekly.mjs`（零外部依赖，node ≥18） |
-| 体检脚本 | `<skill目录>/scripts/check-cards.mjs`（CWD 自动定位：`.github-cards/` → `assets/cards/` → 脚本相对路径） |
-| 新布局产物 | `<CWD>/.github-cards/`：data.json / readmes/ / avatars/ / cards.html / 01-06.png（1242×1656） |
-| 参考图 | 不入仓（`<skill目录>/references/7703407329438531791/`：`all/slide-01..06.webp` + `sampling.py`）；签名 URL 会过期，有本地图绝不重拉 |
-
-## 版式要点（勿改版式只填内容）
-
-- **周榜双项**：`ihead`（蓝序号 + 56px 头像 + 名 72px/长名 40px + org + 右侧「本周净增⭐」）→ `oneline` 34px 黑 900 → `badges`（语言/许可/榜单/年龄，首枚蓝）→ `cols`（左 452px 面板 3 步 / 右灰字描述 + 蓝分类）→ `points` ▸ 蓝前导 → `warn` ⚠ 灰；c1 十行排行（前 3 行着色）
-- **日榜满版**：`hd`（104px/长名 56px 大标题）→ `oneline` 40px → `badges` → `cols`（504px 面板）→ `points` → `warn` → `foot`
-- 长名靠 `.long` 降字号（脚本已自动加），别等体检发现 clip 才改
-
-## 坑（全踩过）
-
-- `hypit capture screenshot` 必带 `--channel chrome`（默认找 puppeteer 缓存，常没有）；输出拒覆盖 → 先删
-- 截图用 `--selector "#cN"` 单元素截，别 `--full-page`
-- 周榜读数随时段漂移 + 官方 trending 列表非按星数排序 → 一律用 fetch 脚本「并集按周净增」口径
-- fetch 脚本未认证走 60/h API 限额（10 仓 + 10 用户 = 20 次，够用）；超限/被限就设 `GH_TOKEN` 或等额度刷新
-- README 缺失的仓（如本期 t3code 无 desc）文案靠 API description + 页面正文，别硬编
-- 参考图签名 URL 过期别重拉，用本地 `references/`
+| 抓取器 | `tools/trending_fetch.py`（日榜+周榜解析 + REST repo_detail） |
+| 出片工具 | `tools/cards.py`(渲染) / `tts.py` / `align.py`(对齐+合成) / `assemble.py` / `gen_hf.py` |
+| 主题系统 | `tools/cards.py` PALETTES：paper/corporate/tech/sketch（本 skill 固定 paper） |
+| 8 卡流程 | `flows/default-8pages.json`（音色 zh-CN-YunxiNeural +10%，1080×1920 30fps） |
+| 期历史/主线 | `TODO.md`（每期一行：选品+主线+时长+验帧位置） |
+| 发布 | `doc/发布流程.md`（用户侧） |
