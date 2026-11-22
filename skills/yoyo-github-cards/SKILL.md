@@ -56,8 +56,6 @@ description: GitHub 热门排行六卡图文（抖音图文素材）：在任意
 - `hypit capture screenshot` 必带 `--channel chrome`（默认找 puppeteer 缓存，常没有）；输出拒覆盖 → 先删
 - 截图用 `--selector "#cN"` 单元素截，别 `--full-page`
 - 周榜读数随时段漂移 + 官方 trending 列表非按星数排序 → 一律用 fetch 脚本「并集按周净增」口径
-- fetch 脚本未认证走 60/h API 限额；超限/被限就 `GH_TOKEN="$(gh auth token)"` 前缀重跑（脚本已支持 Bearer）
-- **trending HTML 页必须带浏览器 UA**（脚本已改）：GitHub 会拦自定义 UA 的 trending 请求（整页 fetch failed/超时）
-- **共享出口 IP 会被 GitHub 二级限流（403 间歇出现）**：脚本已加 Connection:close + 403/429 长退避重试 + 分榜页 6h 本地缓存（`.github-cards/cache/`），整脚本跑失败就隔 30-45s 重跑，通常 2-4 次内过
+- fetch 脚本未认证走 60/h API 限额（10 仓 + 10 用户 = 20 次，够用）；超限/被限就设 `GH_TOKEN` 或等额度刷新
 - README 缺失的仓（如本期 t3code 无 desc）文案靠 API description + 页面正文，别硬编
 - 参考图签名 URL 过期别重拉，用本地 `references/`
