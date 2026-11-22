@@ -9,47 +9,46 @@
 //   cards.html         按 assets/cards-weekly10.html 模板填好机械字段的草稿（TODO 文案待 agent 补）
 // 依赖：出图另需全局 hypit CLI + Chrome（`hypit capture ...`），与本脚本无关。
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-// 出网代理（本机直连 github.com 被墙的机器）：需已安装 undici（npm i undici，可放在项目或全局）；
-// 读 HTTPS_PROXY/https_proxy，没有 undici 时只告警、直连
-const proxyUrl = process.env.HTTPS_PROXY || process.env.https_proxy
-if (proxyUrl) {
-  try {
-    const { ProxyAgent, setGlobalDispatcher } = await import('undici')
-    setGlobalDispatcher(new ProxyAgent(proxyUrl))
-  } catch {
-    console.warn('! 检测到代理环境变量但 undici 未安装（npm i undici），本次走直连')
-  }
-}
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > -1 ? process.argv[i + 1] : d }
 const TOP = Number(arg('--top', 10))
 const OUT = resolve(arg('--out', '.github-cards'))
 const LANGS = ['python', 'rust', 'typescript', 'javascript', 'go', 'cpp', 'c', 'java', 'swift', 'kotlin']
-const UA = { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36' } }
+const UA = { 'User-Agent': 'yoyo-github-cards-fetch/1.0' }
+if (process.env.GH_TOKEN) UA.Authorization = `Bearer ${process.env.GH_TOKEN}`
+// 共享出口 IP 易被 GitHub 二级限流：每条 API 请求新开连接（不复用 keep-alive），降低中招面
 
-// 间歇性 ECONNRESET/超时（本机 DPI 抽风）：网络错重试 3 次（退避 3s/6s）
-const get = async (url) => {
-  let last
-  for (let a = 0; a < 3; a++) {
-    try {
-      const r = await fetch(url, { ...UA, signal: AbortSignal.timeout(15000) })
-      if (r.ok) return r
-      last = new Error(`${url} → ${r.status}`)
-      if (r.status >= 400 && r.status < 500) break // 4xx 不重试
-    } catch (e) { last = e }
-    if (a < 2) await new Promise(r2 => setTimeout(r2, 3000 * (a + 1)))
+const BROWSER_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36'
+const fetchWithRetry = async (url, headers) => {
+  const sleep = ms => new Promise(r => setTimeout(r, ms))
+  for (let i = 0; ; i++) {
+    const ac = new AbortController(); const t = setTimeout(() => ac.abort(), 30000)
+    let r
+    try { r = await fetch(url, { ...headers, signal: ac.signal }) } catch (e) { clearTimeout(t); if (i >= 3) throw new Error(`${url} → ${e.message}`); await sleep(3000 * (i + 1)); continue }
+    clearTimeout(t)
+    if (r.ok) return r
+    if (r.status === 403 || r.status === 429 || r.status >= 500) {
+      const ra = Number(r.headers.get('retry-after'))
+      if (i >= 7) throw new Error(`${url} → ${r.status}`)
+      // 共享 IP 的二级限流窗口持续几十秒到几分钟，重试间隔拉长
+      await sleep(Math.min(ra || 0, 60) * 1000 + 8000 * (i + 1)); continue
+    }
+    throw new Error(`${url} → ${r.status}`)
   }
-  // 兜底：node fetch 重试全败后走 curl（本机直连通道，零新增依赖，curl 各系统自带）
-  try {
-    const { execSync } = await import('node:child_process')
-    const out = execSync(`curl -sL --max-time 25 -A "yoyo-github-cards-fetch/1.0" ${JSON.stringify(url)}`, { maxBuffer: 64 * 1024 * 1024 })
-    if (out && out.length > 0) return new Response(out)
-  } catch { /* 落到 throw last */ }
-  throw last
+}
+// trending HTML 页必须带浏览器 UA，GitHub 会拦自定义 UA 的 trending 请求
+const getHtml = url => fetchWithRetry(url, { 'User-Agent': BROWSER_UA, 'Accept': 'text/html' })
+const get = url => fetchWithRetry(url, { ...UA, 'Connection': 'close' })
+const sleep = ms => new Promise(r => setTimeout(r, ms))
+const CACHE = join(OUT, 'cache')
+const cacheHtml = async (slug, url) => {
+  const cf = join(CACHE, `trending-${slug}.html`)
+  if (existsSync(cf) && Date.now() - statSync(cf).mtimeMs < 6 * 3600 * 1000) { console.log(`  ${slug} 用缓存(6h 内)`); return readFileSync(cf, 'utf8') }
+  const html = await (await getHtml(url)).text()
+  mkdirSync(CACHE, { recursive: true }); writeFileSync(cf, html)
+  return html
 }
 
 function parseTrending(html) {
@@ -113,7 +112,7 @@ function c1Row(i, d) {
 async function main() {
   console.log(`[1/5] 抓取周榜（全站 + ${LANGS.length} 语言分榜, since=weekly）...`)
   const slugs = ['all', ...LANGS]
-  const pages = await Promise.allSettled(slugs.map(s => get(`https://github.com/trending/${s === 'all' ? '' : s + '/'}?since=weekly`).then(r => r.text())))
+  const pages = await Promise.allSettled(slugs.map(s => cacheHtml(s === 'all' ? 'site' : s, `https://github.com/trending/${s === 'all' ? '' : s + '/'}?since=weekly`)))
   const union = new Map()
   let got = 0
   for (const p of pages) {
@@ -136,6 +135,7 @@ async function main() {
     d.pushed = meta.pushed_at?.slice(0, 10) || ''; d.issues = meta.open_issues_count ?? 0
     d.desc = meta.description || ''; d.age = d.created ? age(d.created) : '?'
     const u = await (await get(`https://api.github.com/users/${owner}`)).json().catch(() => ({}))
+    await sleep(250) // 共享 IP 易二级限流，API 调用间留气口
     if (u.avatar_url) {
       const a = join(OUT, 'avatars', `${owner}.png`)
       if (!existsSync(a)) { const img = await get(u.avatar_url); writeFileSync(a, Buffer.from(await img.arrayBuffer())) }
@@ -156,7 +156,7 @@ async function main() {
   writeFileSync(join(OUT, 'data.json'), JSON.stringify(top.map((d, i) => ({ rank: i + 1, ...d })), null, 2))
 
   console.log('[3/5] 生成 cards.html 草稿...')
-  const tplPath = join(dirname(fileURLToPath(import.meta.url)), '..', 'assets', 'cards-weekly10.html')
+  const tplPath = join(dirname(new URL(import.meta.url).pathname), '..', 'assets', 'cards-weekly10.html')
   const tpl = readFileSync(tplPath, 'utf8')
   const cnt = top.map(d => d.lang || '?')
   const topCnt = (l) => cnt.filter(c => c === l).length
