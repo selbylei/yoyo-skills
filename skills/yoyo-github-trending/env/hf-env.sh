@@ -1,4 +1,4 @@
-# hf-env.sh — HyperFrames 本机渲染环境(跨机自适应, 由 yoyo-github-cards skill 携带)
+# hf-env.sh — HyperFrames 本机渲染环境(跨机自适应, 由 yoyo-github-trending skill 携带)
 # 用法(git-bash/zsh/bash): source <skill目录>/env/hf-env.sh && cd <期目录>/hyperframes && npx --yes hyperframes@0.8.91 render
 # 前置: node ≥18 + Chrome(或 Playwright Chromium/Edge) + pip 装过 imageio-ffmpeg
 export HYPERFRAMES_NO_UPDATE_CHECK=1
