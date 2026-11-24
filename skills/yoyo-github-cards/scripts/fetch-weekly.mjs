@@ -19,6 +19,8 @@ const TOP = Number(arg('--top', 10))
 const OUT = resolve(arg('--out', '.github-cards'))
 const THEME = arg('--theme', '')
 const TPL_FILE = THEME ? `cards-weekly10-${THEME}.html` : 'cards-weekly10.html'
+// --offline：跳过抓取与 API，从 OUT/data.json + 既有 readmes/avatars/ 重建 cards.html（换主题/补草稿专用，零网络）
+const OFFLINE = process.argv.includes('--offline')
 const LANGS = ['python', 'rust', 'typescript', 'javascript', 'go', 'cpp', 'c', 'java', 'swift', 'kotlin']
 const UA = { 'User-Agent': 'yoyo-github-cards-fetch/1.0' }
 if (process.env.GH_TOKEN) UA.Authorization = `Bearer ${process.env.GH_TOKEN}`
@@ -115,6 +117,11 @@ function c1Row(i, d) {
 }
 
 async function main() {
+  let top
+  if (OFFLINE) {
+    console.log('[offline] 跳过抓取，用既有 data.json + readmes 重建草稿...')
+    top = JSON.parse(readFileSync(join(OUT, 'data.json'), 'utf8'))
+  } else {
   console.log(`[1/5] 抓取周榜（全站 + ${LANGS.length} 语言分榜, since=weekly）...`)
   const slugs = ['all', ...LANGS]
   const pages = await Promise.allSettled(slugs.map(s => cacheHtml(s === 'all' ? 'site' : s, `https://github.com/trending/${s === 'all' ? '' : s + '/'}?since=weekly`)))
@@ -159,6 +166,7 @@ async function main() {
     if (!ok) console.log(`  ! ${d.repo} 没抓到 README（文案靠 API desc）`)
   }
   writeFileSync(join(OUT, 'data.json'), JSON.stringify(top.map((d, i) => ({ rank: i + 1, ...d })), null, 2))
+  } // end if (!OFFLINE)
 
   console.log('[3/5] 生成 cards.html 草稿...')
   const tplPath = join(dirname(fileURLToPath(import.meta.url)), '..', 'assets', TPL_FILE)
