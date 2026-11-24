@@ -84,7 +84,7 @@ function itemBlock(i, d) {
   const name = d.repo.split('/')[1]
   const h2 = name.length > 10 ? `<h2 class="long">${name}</h2>` : `<h2>${name}</h2>`
   const badges = `<span class="bdg">${d.lang || '—'}</span><span class="bdg">${d.license}</span><span class="bdg">周榜第 ${i}</span><span class="bdg">${d.age}</span>`
-  return `<div class="ihead">
+  return `<div class="item it${i}">\n  <div class="ihead">
     <span class="num">${String(i).padStart(2, '0')}</span><img class="ava" src="avatars/${d.owner}.png" alt="${d.owner}">
     <span class="nm">${h2}<div class="org">${d.repo}</div></span>
     <span class="gain"><span class="lb">本周净增⭐</span><span class="v">+${d.weekly.toLocaleString('en-US')}</span></span>
@@ -103,7 +103,8 @@ function itemBlock(i, d) {
   <div class="points">
     <p><span class="k">▸</span>TODO: 亮点 1-2 条（各 ≤20 字）</p>
   </div>
-  <div class="warn"><span class="k">⚠</span>TODO: 注意（1 行）</div>`
+  <div class="warn"><span class="k">⚠</span>TODO: 注意（1 行）</div>
+  </div>`
 }
 
 function c1Row(i, d) {

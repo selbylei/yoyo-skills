@@ -11,6 +11,7 @@ description: GitHub 热门排行六卡图文（抖音图文素材）：在任意
 
 设计令牌（勿凭记忆改）：浅色主题 bg `#fafbf8` / 蓝 `#174bb9` / 线 `#dadad8` / 面板 `#f1f4ff` / top3 行底 `#fceeec #fcf6e6 #edf2fe`；正文 **Noto Sans SC**（缺则同类 CJK 无衬线，mac 用 PingFang SC，勿换回 YaHei），等宽 **Consolas**。
 水彩草木主题（11-24 加，`--theme watercolor`，参考 note-7711258295952439232「HF 开源雷达」采样）：bg `#fcfbf5` / 墨 `#2f342d` / 灰 `#60625f` / 线 `#ddd9cb` / 面板 `#f4f1e6` / 主绿 sage `#4e6556` / 棕 bronze `#8a7059` / 星绿 `#4f6847` / 序号灰褐 `#7f7367` / top3 行底 `#f6efdf #eef3e8 #e9edf2`；标题/仓名用 **Noto Serif SC** 衬线（勿用 Sans 顶），正文 Noto Sans SC，等宽 Consolas；底部三层水彩山峦（远 `#c6d0d8`/中 `#a7bba9`/近 `#87997f`，footer 白字落近层）+ 边角草木（叶 `#97a7b6`/`#5f7a63` 低透明）。山峦/草木对比度以像素采样验（底带均值比 bg 深 50+ 档），别只靠目检。
+马卡龙色卡主题（11-24 加，`--theme pastel`，参考 note-7710393055341268259「GitHub 学习神器」像素分析）：bg 暖米 `#fdf9f4` / 墨 `#2b2b30` / 灰 `#75757a` / 线 `#e9e4da` / 卡底 `#fffdfa` + 柔和阴影；强调色组按项轮换 a1 蓝 `#d9e6f8/#4a6fa5` · a2 黄 `#fbe7cd/#b07d3f` · a3 紫 `#e3e0f5/#7a6fb8` · a4 青 `#d8efef/#3f9595` · a5 绿 `#e0efe0/#5c8a5c` · a6 粉 `#f8e2e2/#b05c6e`（it1-6=a1-6，it7-10 回环 a1-4；序号块为 pastel 圆角瓦）；top3 行底 `#eaf2fc #fdf3e1 #f0edfa`；正文 Noto Sans SC + Consolas。
 
 ## 周榜快跑（零依赖布局，推荐）
 
@@ -41,6 +42,7 @@ description: GitHub 热门排行六卡图文（抖音图文素材）：在任意
 |---|---|
 | 双项模板（周榜版·浅色） | `<skill目录>/assets/cards-weekly10.html`（占位符由 fetch-weekly.mjs 填充） |
 | 双项模板（周榜版·水彩草木） | `<skill目录>/assets/cards-weekly10-watercolor.html`（11-24 新主题，DOM/占位符同浅色版，仅 CSS+内联 SVG 帧不同） |
+| 双项模板（周榜版·马卡龙色卡） | `<skill目录>/assets/cards-weekly10-pastel.html`（11-24 新主题；按项 pastel 强调色轮换依赖 fetch-weekly 的 `item itN` wrapper） |
 | 单项目模板（日榜版） | `<skill目录>/assets/cards.html` |
 | 数据+草稿脚本 | `<skill目录>/scripts/fetch-weekly.mjs`（零外部依赖，node ≥18） |
 | 体检脚本 | `<skill目录>/scripts/check-cards.mjs`（CWD 自动定位：`.github-cards/` → `assets/cards/` → 脚本相对路径） |
@@ -64,3 +66,4 @@ description: GitHub 热门排行六卡图文（抖音图文素材）：在任意
 - README 缺失的仓（如本期 t3code 无 desc）文案靠 API description + 页面正文，别硬编
 - 参考图签名 URL 过期别重拉，用本地 `references/`
 - fetch-weekly 模板路径 Windows 下必须 `fileURLToPath(import.meta.url)`（`new URL().pathname` 出 `/C:/...` 带前导斜杠 → 被当相对路径拼到 CWD，报 ENOENT `F:\C:\...`）
+- **安装目录会被 yoyo-skills git 仓重新物化**（11-24 14:11 实录：未 commit 的新文件被删、未 commit 的改动被回退、行尾被重写 CRLF）。skill 改动一律先在 `F:\learn\yoyo-skills` 仓内做 + `git commit`，再同步到安装位；只改安装位 = 白改
