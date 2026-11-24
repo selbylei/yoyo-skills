@@ -9,7 +9,8 @@ description: GitHub 热门排行六卡图文（抖音图文素材）：在任意
 - **周榜 TOP10 双项版**（11-08 起主线）：c1 十行排行 + c2-c6 每卡 2 项；数据源 = GitHub 周榜（全站 + 语言分榜并集按周净增排序）
 - **日榜 TOP5 单项目满版页**（旧流程）：c2-c6 每卡 1 项目；数据源 = 每期日报 `GitHub-Trending/<date>.md`
 
-设计令牌（勿凭记忆改）：bg `#fafbf8` / 蓝 `#174bb9` / 线 `#dadad8` / 面板 `#f1f4ff` / top3 行底 `#fceeec #fcf6e6 #edf2fe`；正文 **Noto Sans SC**（缺则同类 CJK 无衬线，mac 用 PingFang SC，勿换回 YaHei），等宽 **Consolas**。
+设计令牌（勿凭记忆改）：浅色主题 bg `#fafbf8` / 蓝 `#174bb9` / 线 `#dadad8` / 面板 `#f1f4ff` / top3 行底 `#fceeec #fcf6e6 #edf2fe`；正文 **Noto Sans SC**（缺则同类 CJK 无衬线，mac 用 PingFang SC，勿换回 YaHei），等宽 **Consolas**。
+水彩草木主题（11-24 加，`--theme watercolor`，参考 note-7711258295952439232「HF 开源雷达」采样）：bg `#fcfbf5` / 墨 `#2f342d` / 灰 `#60625f` / 线 `#ddd9cb` / 面板 `#f4f1e6` / 主绿 sage `#4e6556` / 棕 bronze `#8a7059` / 星绿 `#4f6847` / 序号灰褐 `#7f7367` / top3 行底 `#f6efdf #eef3e8 #e9edf2`；标题/仓名用 **Noto Serif SC** 衬线（勿用 Sans 顶），正文 Noto Sans SC，等宽 Consolas；底部三层水彩山峦（远 `#c6d0d8`/中 `#a7bba9`/近 `#87997f`，footer 白字落近层）+ 边角草木（叶 `#97a7b6`/`#5f7a63` 低透明）。山峦/草木对比度以像素采样验（底带均值比 bg 深 50+ 档），别只靠目检。
 
 ## 周榜快跑（零依赖布局，推荐）
 
@@ -19,7 +20,7 @@ description: GitHub 热门排行六卡图文（抖音图文素材）：在任意
 
 | 步 | 做什么 |
 |---|---|
-| 1 数据+草稿 | `cd <项目根> && node <skill>/scripts/fetch-weekly.mjs [--top 10]` → `.github-cards/`：`data.json`（TOP N 全字段）、`avatars/`（owner 头像现抓）、`readmes/`（各仓 README 前 200 行）、`cards.html` 草稿（机械字段已填：序号/头像/星数/周净增/语言/许可/年龄/榜单徽标，长名自动加 `.long`；余 ~81 处 TODO 文案） |
+| 1 数据+草稿 | `cd <项目根> && node <skill>/scripts/fetch-weekly.mjs [--top 10] [--theme watercolor]`（`--theme` 选 `assets/cards-weekly10-<name>.html` 主题模板，缺省浅色）→ `.github-cards/`：`data.json`（TOP N 全字段）、`avatars/`（owner 头像现抓）、`readmes/`（各仓 README 前 200 行）、`cards.html` 草稿（机械字段已填：序号/头像/星数/周净增/语言/许可/年龄/榜单徽标，长名自动加 `.long`；余 ~81 处 TODO 文案） |
 | 2 填文案 | agent 读 `.github-cards/readmes/*` + `data.json`，替换 cards.html 中 TODO：一句话简介（≤20 字）/ c1 短标签（≤10 字）/ 面板 3 步流程 / 描述 2-3 行 / 蓝色分类 / 亮点 1-2 条 / ⚠ 注意 1 行。质量要求同日榜版（亮点要具体、注意要可操作） |
 | 3 体检 | `cd <项目根> && hypit capture run <skill>/scripts/check-cards.mjs --channel chrome`（自动定位 `.github-cards/cards.html`，旧 `assets/cards/` 布局也认）→ 6/6 全 0 才出图（数值走文本判断，别逐张读图进上下文；目检拼 1 张 montage） |
 | 4 出图 | `for i in 1..6: rm -f .github-cards/NN.png && hypit capture screenshot <项目根>/.github-cards/cards.html --selector "#c$i" --to ".github-cards/NN.png" --viewport 1242x1656 --channel chrome`（拒覆盖，先删） |
@@ -38,7 +39,8 @@ description: GitHub 热门排行六卡图文（抖音图文素材）：在任意
 
 | 是什么 | 位置 |
 |---|---|
-| 双项模板（周榜版） | `<skill目录>/assets/cards-weekly10.html`（占位符由 fetch-weekly.mjs 填充） |
+| 双项模板（周榜版·浅色） | `<skill目录>/assets/cards-weekly10.html`（占位符由 fetch-weekly.mjs 填充） |
+| 双项模板（周榜版·水彩草木） | `<skill目录>/assets/cards-weekly10-watercolor.html`（11-24 新主题，DOM/占位符同浅色版，仅 CSS+内联 SVG 帧不同） |
 | 单项目模板（日榜版） | `<skill目录>/assets/cards.html` |
 | 数据+草稿脚本 | `<skill目录>/scripts/fetch-weekly.mjs`（零外部依赖，node ≥18） |
 | 体检脚本 | `<skill目录>/scripts/check-cards.mjs`（CWD 自动定位：`.github-cards/` → `assets/cards/` → 脚本相对路径） |
@@ -61,3 +63,4 @@ description: GitHub 热门排行六卡图文（抖音图文素材）：在任意
 - **共享出口 IP 会被 GitHub 二级限流（403 间歇出现）**：脚本已加 Connection:close + 403/429 长退避重试 + 分榜页 6h 本地缓存（`.github-cards/cache/`），整脚本跑失败就隔 30-45s 重跑，通常 2-4 次内过
 - README 缺失的仓（如本期 t3code 无 desc）文案靠 API description + 页面正文，别硬编
 - 参考图签名 URL 过期别重拉，用本地 `references/`
+- fetch-weekly 模板路径 Windows 下必须 `fileURLToPath(import.meta.url)`（`new URL().pathname` 出 `/C:/...` 带前导斜杠 → 被当相对路径拼到 CWD，报 ENOENT `F:\C:\...`）

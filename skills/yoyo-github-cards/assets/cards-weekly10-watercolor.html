@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>GitHub 周榜 TOP10 六卡模板（双项版式 · 水彩植物主题 · 占位内容，fetch-weekly.mjs 填充）</title>
+<!--
+  周榜 TOP10 双项版式（2026-11-24 新主题，参照参考 note-7711258295952439232「HF 开源雷达」slide-01/02 像素采样）：
+  米白底 + 水彩草木边角 + 底部水彩山峦 + 衬线大字。DOM/占位符与 cards-weekly10.html 一致，fetch-weekly.mjs 直接填充。
+  设计令牌（勿凭记忆改）：bg #fcfbf5 / 墨 #2f342d / 灰 #60625f / 线 #ddd9cb / 面板 #f4f1e6 /
+  主绿(sage) #4e6556 / 棕(bronze) #8a7059 / 星绿 #4f6847 / 序号灰褐 #7f7367 /
+  top3 行底 米 #f6efdf 苔 #eef3e8 蓝灰 #e9edf2。
+  字体：名/标题 Noto Serif SC（缺则同类 CJK 衬线，mac 用 Songti SC），正文 Noto Sans SC，等宽 Consolas。
+-->
+<style>
+:root{
+  --bg:#fcfbf5; --ink:#2f342d; --gray:#6a6c63; --gray2:#66685f; --note:#63655c;
+  --line:#ddd9cb; --panel:#f4f1e6; --sage:#4e6556; --bronze:#8a7059; --star:#4f6847; --taupe:#7f7367;
+  --tint1:#f6efdf; --tint2:#eef3e8; --tint3:#e9edf2;
+  --mono:Consolas,"SF Mono",Menlo,monospace;
+  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC",serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink)}
+section{width:1242px;height:1656px;position:relative;overflow:hidden;background:var(--bg);
+  padding:0 92px 0;display:flex;flex-direction:column}
+/* 水彩边框/山峦层（内联 SVG，置于所有内容之下） */
+.frame{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.topbar,.hero,.lang,.meta,.rank,.ihead,.oneline,.badges,.cols,.points,.warn,.foot{position:relative;z-index:1}
+
+/* ---------- 公共：顶栏 ---------- */
+.topbar{display:flex;justify-content:space-between;align-items:center;
+  padding-top:64px;padding-bottom:23px;border-bottom:1px solid var(--line)}
+.topbar .brand{font-size:24px;color:var(--gray)}
+.topbar .brand b{color:var(--sage);font-family:var(--serif);font-weight:700}
+.topbar .pg{font-family:var(--mono);font-size:26px;font-weight:700;color:#4a4d47}
+
+/* ---------- c1 封面（周榜 TOP10 十行） ---------- */
+#c1{padding-bottom:190px}
+.hero{margin-top:44px;line-height:1.28}
+.hero .l1,.hero .l2{font-size:96px;font-family:var(--serif);font-weight:700}
+.hero .l1{color:var(--sage)}
+.hero .l2{color:var(--ink)}
+.hero .topN{color:var(--bronze);position:relative;margin-left:26px;padding-bottom:14px}
+.hero .topN::after{content:"";position:absolute;left:0;right:0;bottom:0;height:10px;background:var(--bronze);opacity:.75}
+.lang{margin-top:24px;font-size:24px;color:var(--note)}
+.meta{margin-top:14px;font-family:var(--mono);font-size:28px;font-weight:700;color:var(--taupe)}
+.rank{margin-top:16px;flex:1;display:flex;flex-direction:column;
+  border:1px solid #e2ded0;border-radius:16px;overflow:hidden;background:#fffefa}
+.rank-head{display:flex;justify-content:space-between;align-items:center;
+  height:54px;padding:0 28px;font-size:22px;color:var(--gray);font-weight:600;background:#fffefa}
+.rank-head .star{color:var(--gray)}
+.row{flex:1;display:flex;align-items:center;gap:20px;padding:0 28px;
+  border-top:1px solid var(--line);min-height:0}
+.row.r1{background:var(--tint1)} .row.r2{background:var(--tint2)} .row.r3{background:var(--tint3)}
+.row .num{font-family:var(--serif);font-size:32px;font-weight:400;color:var(--taupe);width:48px;flex:0 0 48px}
+.row .ava{width:44px;height:44px;border-radius:12px;object-fit:cover;flex:0 0 44px}
+.row .nm{flex:1;min-width:0}
+.row .name{font-size:27px;font-weight:800;font-family:var(--serif);line-height:1.2}
+.row .od{font-size:15px;color:var(--gray);margin-top:2px}
+.row .stars{font-family:var(--mono);font-size:27px;font-weight:800;color:var(--star)}
+
+/* ---------- c2-c6 双项页（11-08 周榜期版式） ---------- */
+.card-page{padding-bottom:129px}
+.ihead{display:flex;align-items:center;gap:22px;margin-top:30px;min-height:78px}
+.ihead + .ihead{margin-top:0}
+.ihead .num{font-family:var(--serif);font-size:58px;font-weight:400;color:var(--taupe);width:72px;flex:0 0 72px}
+.ihead .ava{width:56px;height:56px;border-radius:14px;object-fit:cover;flex:0 0 56px}
+.ihead .nm{flex:1;min-width:0}
+.ihead h2{font-size:72px;font-weight:700;font-family:var(--serif);line-height:1.05}
+.ihead h2.long{font-size:40px}
+.ihead .org{font-family:var(--mono);font-size:18px;color:var(--gray);margin-top:5px}
+.gain{margin-left:auto;text-align:right;flex:0 0 auto}
+.gain .lb{font-size:19px;color:var(--gray)}
+.gain .v{font-family:var(--mono);font-size:38px;font-weight:800;color:var(--star);margin-top:3px}
+.oneline{margin-top:14px;font-size:34px;font-weight:800;line-height:1.28}
+.badges{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.bdg{font-size:20px;font-weight:600;padding:8px 18px;border-radius:12px;background:#f4f2e8;color:#4a4a45}
+.bdg:first-child{background:var(--sage);color:#fff}
+.cols{display:flex;gap:34px;margin-top:16px;align-items:stretch}
+.panel{flex:0 0 452px;width:452px;background:var(--panel);border:1px solid #e6e1d0;border-radius:20px;padding:26px}
+.step{margin-bottom:12px}
+.step:last-child{margin-bottom:0}
+.step .t{font-size:24px;font-weight:700;font-family:var(--serif)}
+.step .d{font-size:18px;color:var(--note);margin-top:3px;line-height:1.45}
+.cols .right{flex:1;min-width:0;display:flex;flex-direction:column}
+.cols .desc{font-size:21px;color:var(--gray2);line-height:1.6}
+.cols .cat{font-size:25px;font-weight:800;color:var(--sage);margin-top:auto;padding-top:14px}
+.points{margin-top:10px}
+.points p{font-size:21px;line-height:1.45;font-weight:500;margin-bottom:2px}
+.points .k{color:var(--bronze);font-weight:800;margin-right:10px}
+.warn{margin-top:8px;font-size:19px;color:var(--gray)}
+.warn .k{margin-right:8px}
+.foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center}
+.foot .repo{font-family:var(--mono);font-size:20px;color:#fff;text-shadow:0 1px 3px rgba(47,52,45,.45)}
+.foot .pg{font-family:var(--mono);font-size:24px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(47,52,45,.45)}
+</style>
+
+<!-- 水彩边框：草木 + 底部山峦（每卡复用；色值采样自参考 slide） -->
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="wc-frame" viewBox="0 0 1242 1656" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <filter id="wc-blur-lg" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="16"/></filter>
+      <filter id="wc-blur-sm" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="3"/></filter>
+    </defs>
+    <!-- 底部三层水彩山峦 + 雾带（色值采样自参考 slide；近层压深保证 footer 白字对比） -->
+    <g filter="url(#wc-blur-lg)">
+      <path d="M0,1520 C200,1472 420,1512 620,1482 C860,1452 1050,1506 1242,1470 L1242,1656 L0,1656 Z" fill="#c6d0d8" opacity=".9"/>
+      <path d="M0,1566 C260,1532 520,1566 760,1534 C1000,1506 1140,1552 1242,1540 L1242,1656 L0,1656 Z" fill="#a7bba9" opacity=".95"/>
+      <path d="M0,1616 C300,1588 560,1622 820,1594 C1050,1570 1150,1608 1242,1596 L1242,1656 L0,1656 Z" fill="#87997f"/>
+      <rect x="0" y="1470" width="1242" height="44" fill="#fff" opacity=".4"/>
+    </g>
+    <!-- 左上草木 -->
+    <g filter="url(#wc-blur-sm)" opacity=".85">
+      <path d="M26,540 C66,360 34,240 98,86" fill="none" stroke="#5f7a63" stroke-width="3" opacity=".5"/>
+      <path d="M84,560 C120,400 96,280 150,150" fill="none" stroke="#97a7b6" stroke-width="2.5" opacity=".45"/>
+      <ellipse cx="52" cy="486" rx="40" ry="15" fill="#97a7b6" opacity=".6" transform="rotate(-30 52 486)"/>
+      <ellipse cx="96" cy="420" rx="46" ry="16" fill="#5f7a63" opacity=".55" transform="rotate(-64 96 420)"/>
+      <ellipse cx="44" cy="330" rx="38" ry="14" fill="#7d94a8" opacity=".55" transform="rotate(-24 44 330)"/>
+      <ellipse cx="92" cy="256" rx="44" ry="15" fill="#8aa08f" opacity=".5" transform="rotate(-58 92 256)"/>
+      <ellipse cx="60" cy="168" rx="34" ry="13" fill="#97a7b6" opacity=".6" transform="rotate(-20 60 168)"/>
+      <ellipse cx="128" cy="150" rx="30" ry="11" fill="#5f7a63" opacity=".45" transform="rotate(-52 128 150)"/>
+      <circle cx="120" cy="96" r="10" fill="#ccd6c5" opacity=".85"/>
+      <circle cx="152" cy="120" r="7" fill="#8fa58a" opacity=".7"/>
+    </g>
+    <!-- 左下小草簇 -->
+    <g filter="url(#wc-blur-sm)" opacity=".7">
+      <ellipse cx="70" cy="1236" rx="34" ry="12" fill="#5f7a63" opacity=".4" transform="rotate(-40 70 1236)"/>
+      <ellipse cx="112" cy="1272" rx="40" ry="14" fill="#97a7b6" opacity=".4" transform="rotate(-70 112 1272)"/>
+      <ellipse cx="58" cy="1306" rx="30" ry="11" fill="#8aa08f" opacity=".4" transform="rotate(-30 58 1306)"/>
+    </g>
+    <!-- 右侧中上稀疏叶片 -->
+    <g filter="url(#wc-blur-sm)" opacity=".7">
+      <path d="M1216,760 C1180,640 1204,540 1160,430" fill="none" stroke="#97a7b6" stroke-width="2.5" opacity=".4"/>
+      <ellipse cx="1178" cy="700" rx="36" ry="13" fill="#97a7b6" opacity=".42" transform="rotate(28 1178 700)"/>
+      <ellipse cx="1196" cy="596" rx="40" ry="14" fill="#8aa08f" opacity=".4" transform="rotate(60 1196 596)"/>
+      <ellipse cx="1170" cy="500" rx="32" ry="12" fill="#5f7a63" opacity=".38" transform="rotate(24 1170 500)"/>
+      <ellipse cx="1196" cy="856" rx="44" ry="15" fill="#7d94a8" opacity=".4" transform="rotate(70 1196 856)"/>
+    </g>
+    <!-- 右上白花 + 绿蕾 -->
+    <g filter="url(#wc-blur-sm)" opacity=".9">
+      <ellipse cx="1096" cy="180" rx="30" ry="20" fill="#fff" opacity=".85" transform="rotate(-18 1096 180)"/>
+      <ellipse cx="1136" cy="158" rx="28" ry="18" fill="#f6f8f2" opacity=".8" transform="rotate(24 1136 158)"/>
+      <ellipse cx="1146" cy="204" rx="26" ry="17" fill="#fff" opacity=".8" transform="rotate(78 1146 204)"/>
+      <circle cx="1124" cy="184" r="9" fill="#ccd6c5"/>
+      <circle cx="1196" cy="252" r="12" fill="#8fa58a" opacity=".65"/>
+      <circle cx="1216" cy="292" r="8" fill="#a8c0a8" opacity=".6"/>
+    </g>
+  </symbol>
+</svg>
+
+<body>
+<!-- ============ c1 封面（周榜 TOP10 排行） ============ -->
+<section id="c1">
+  <svg class="frame" aria-hidden="true"><use href="#wc-frame"/></svg>
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">01 / 06</span></div>
+  <div class="hero">
+    <div class="l1">{{HERO_L1}}</div>
+    <div class="l2">{{HERO_L2}}<span class="topN">{{HERO_TOPN}}</span></div>
+  </div>
+  <div class="lang">{{LANG_LINE}}</div>
+  <div class="meta">{{META_LINE}}</div>
+  <div class="rank">
+    <div class="rank-head"><span>GitHub 周榜 · 收录仓库净增</span><span class="star">本周净增 ⭐</span></div>
+{{C1_ROWS}}
+  </div>
+</section>
+
+<!-- ============ c2-c6 双项页（ITEM_1..ITEM_10 按卡序：c2=1,2 c3=3,4 c4=5,6 c5=7,8 c6=9,10） ============ -->
+<section id="c2" class="card-page">
+  <svg class="frame" aria-hidden="true"><use href="#wc-frame"/></svg>
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">02 / 06</span></div>
+{{ITEM_1}}
+{{ITEM_2}}
+  <div class="foot"><span class="repo">{{FOOT_1}}</span><span class="pg">02 / 06</span></div>
+</section>
+
+<section id="c3" class="card-page">
+  <svg class="frame" aria-hidden="true"><use href="#wc-frame"/></svg>
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">03 / 06</span></div>
+{{ITEM_3}}
+{{ITEM_4}}
+  <div class="foot"><span class="repo">{{FOOT_2}}</span><span class="pg">03 / 06</span></div>
+</section>
+
+<section id="c4" class="card-page">
+  <svg class="frame" aria-hidden="true"><use href="#wc-frame"/></svg>
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">04 / 06</span></div>
+{{ITEM_5}}
+{{ITEM_6}}
+  <div class="foot"><span class="repo">{{FOOT_3}}</span><span class="pg">04 / 06</span></div>
+</section>
+
+<section id="c5" class="card-page">
+  <svg class="frame" aria-hidden="true"><use href="#wc-frame"/></svg>
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">05 / 06</span></div>
+{{ITEM_7}}
+{{ITEM_8}}
+  <div class="foot"><span class="repo">{{FOOT_4}}</span><span class="pg">05 / 06</span></div>
+</section>
+
+<section id="c6" class="card-page">
+  <svg class="frame" aria-hidden="true"><use href="#wc-frame"/></svg>
+  <div class="topbar"><span class="brand"><b>开源周报</b> · GitHub 热门开源</span><span class="pg">06 / 06</span></div>
+{{ITEM_9}}
+{{ITEM_10}}
+  <div class="foot"><span class="repo">{{FOOT_5}}</span><span class="pg">06 / 06</span></div>
+</section>
+
+</body>
+</html>

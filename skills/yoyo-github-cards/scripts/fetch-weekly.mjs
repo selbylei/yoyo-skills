@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // fetch-weekly.mjs — 周榜 TOP10 一键数据 + 草稿（yoyo-github-cards skill 随附）
 // 零外部依赖（Node ≥18 全局 fetch）。用法（在任意项目根目录）：
-//   node <skill>/scripts/fetch-weekly.mjs [--top 10] [--out .github-cards]
+//   node <skill>/scripts/fetch-weekly.mjs [--top 10] [--out .github-cards] [--theme watercolor]
+//   --theme <name> 选 assets/cards-weekly10-<name>.html 主题模板（缺省 cards-weekly10.html 浅色风）
 // 产物（默认 <CWD>/.github-cards/）：
 //   data.json          TOP N 全字段（rank/owner/repo/stars/weekly/license/created/desc/issues/pushed）
 //   avatars/*.png      owner 头像（每期现抓）
@@ -11,10 +12,13 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > -1 ? process.argv[i + 1] : d }
 const TOP = Number(arg('--top', 10))
 const OUT = resolve(arg('--out', '.github-cards'))
+const THEME = arg('--theme', '')
+const TPL_FILE = THEME ? `cards-weekly10-${THEME}.html` : 'cards-weekly10.html'
 const LANGS = ['python', 'rust', 'typescript', 'javascript', 'go', 'cpp', 'c', 'java', 'swift', 'kotlin']
 const UA = { 'User-Agent': 'yoyo-github-cards-fetch/1.0' }
 if (process.env.GH_TOKEN) UA.Authorization = `Bearer ${process.env.GH_TOKEN}`
@@ -156,7 +160,7 @@ async function main() {
   writeFileSync(join(OUT, 'data.json'), JSON.stringify(top.map((d, i) => ({ rank: i + 1, ...d })), null, 2))
 
   console.log('[3/5] 生成 cards.html 草稿...')
-  const tplPath = join(dirname(new URL(import.meta.url).pathname), '..', 'assets', 'cards-weekly10.html')
+  const tplPath = join(dirname(fileURLToPath(import.meta.url)), '..', 'assets', TPL_FILE)
   const tpl = readFileSync(tplPath, 'utf8')
   const cnt = top.map(d => d.lang || '?')
   const topCnt = (l) => cnt.filter(c => c === l).length
